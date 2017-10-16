@@ -1,6 +1,6 @@
 const path = require('path')
 
-exports.appID = 'wx826671981dcd4102'
+exports.appId = 'wx826671981dcd4102'
 
 exports.appSrcret = 'b71b176fe5bad33328bef2e9edcc4f76'
 
