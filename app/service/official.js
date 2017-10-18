@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-18 14:27:16
+ * @Last Modified time: 2017-10-19 02:49:43
  */
 const {
     success,
@@ -16,7 +16,7 @@ const serviceOfficialDynamic = require('../service/officialDynamic')
 const loops = require('../utils/loops')
 
 exports.getOfficialDetail = async(options) => {
-    const { officialId } = options
+    const { officialId, userId } = options
     let dataOfficial = await daoOfficial.get({
         _id: officialId,
         isShow: true,
@@ -30,6 +30,18 @@ exports.getOfficialDetail = async(options) => {
 
     if(dataOfficial) {
         dataOfficial = dataOfficial[0]
+
+        dataOfficial.isOfficialFocus = false
+        if(userId) {
+            const dataOfficialFocus = await serviceOfficialDynamic.getOfficialFocus({
+                userId: userId,
+                officialId: officialId
+            })
+            dataOfficial.isOfficialFocus = !!dataOfficialFocus
+        }
+
+
+
         dataOfficial.officialId = dataOfficial._id
         delete dataOfficial._id
         return dataOfficial
@@ -38,12 +50,8 @@ exports.getOfficialDetail = async(options) => {
 }
 
 exports.getOfficialList = async(options) => {
-    const { wxSessionCode, circleId } = options
+    const { userId, circleId } = options
     try {
-        // 获取用户信息
-        const dataUser = await serviceOfficialUser.getUserInfo({
-            wxSessionCode
-        })
         // 获取官方信息
         const dataOfficialList = await daoOfficial.get({
             circleId,
@@ -63,9 +71,9 @@ exports.getOfficialList = async(options) => {
         if(dataOfficialList) {
             _dataOfficialList = loops.getNewArray(dataOfficialList, (dataOfficialItem, i) => {
                 dataOfficialItem.isOfficialFocus = false
-                if(dataUser) {
+                if(userId) {
                     const dataOfficialFocus = serviceOfficialDynamic.getOfficialFocus({
-                        userId: dataUser.userId,
+                        userId: userId,
                         officialId: dataOfficialItem._id
                     })
                     dataOfficialItem.isOfficialFocus = !!dataOfficialFocus

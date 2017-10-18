@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-18 14:27:22
+ * @Last Modified time: 2017-10-19 02:49:05
  */
 
 const _ = require('../utils/request')
@@ -13,10 +13,14 @@ const { success, fail } = require('../utils/returnUtil')
 const serviceOfficialUser = require('../service/officialUser')
 
 const getList = async (ctx, next) => {
-    const { circleId, wxSessionCode } = ctx.query
+    const { circleId, wxSession } = ctx.query
+    const dataSession = await serviceOfficialUser.wxDeSession({
+        wxSession
+    })
+
     const dataOfficialList = await serviceOfficial.getOfficialList({
         circleId,
-        wxSessionCode
+        userId: dataSession.userInfo.userId
     })
     ctx.response.type ='application/json'
     ctx.response.body = success({
@@ -35,7 +39,8 @@ const getOfficialDetail = async (ctx, next) => {
     let dataOfficialInfo = undefined
     if(dataSession.userInfo.userId) {
         dataOfficialInfo = await serviceOfficial.getOfficialDetail({
-            officialId: officialId
+            officialId: officialId,
+            userId: dataSession.userInfo.userId
         })
     }
     ctx.response.type ='application/json'
