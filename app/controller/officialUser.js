@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-16 01:19:05
+ * @Last Modified time: 2017-10-18 14:46:18
  */
 
 const log = require('../../config/log4js')
@@ -50,6 +50,11 @@ const valid = async (ctx, next) => {
     const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
+
+    const dataOfficialUser = await serviceOfficialUser.getUserDetail({
+        userId: dataSession.userInfo.userId
+    })
+
     ctx.response.type ='application/json'
     // 找到用户
     if(dataSession) {
@@ -57,15 +62,15 @@ const valid = async (ctx, next) => {
             msg: 'getUser',
             data: {
                 userInfo: {
-                    avatarUrl: dataSession.userInfo.avatarUrl,
-                    city: dataSession.userInfo.city,
-                    country: dataSession.userInfo.country,
-                    gender: dataSession.userInfo.gender,
-                    nickName: dataSession.userInfo.nickName,
-                    officialId: dataSession.userInfo.officialId,
-                    phone: dataSession.userInfo.phone,
-                    province: dataSession.userInfo.province,
-                    userId: dataSession.userInfo.userId
+                    avatarUrl: dataOfficialUser.avatarUrl,
+                    city: dataOfficialUser.city,
+                    country: dataOfficialUser.country,
+                    gender: dataOfficialUser.gender,
+                    nickName: dataOfficialUser.nickName,
+                    officialId: dataOfficialUser.officialId,
+                    phone: dataOfficialUser.phone,
+                    province: dataOfficialUser.province,
+                    userId: dataOfficialUser.userId
                 }
             }
         })

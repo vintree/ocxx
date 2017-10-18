@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-16 02:19:38
+ * @Last Modified time: 2017-10-18 15:24:33
  */
 
 const asyncHooks = require('async_hooks')
@@ -172,7 +172,35 @@ const infoSupport = async (ctx, next) => {
     }
 }
 
+const getList = async (ctx, next) => {
+    const { wxSession } = ctx.query
+    const dataSession = await serviceOfficialUser.wxDeSession({
+        wxSession
+    })
+    console.log('dataSession', dataSession);
+    ctx.response.type ='application/json'    
+    if(dataSession) {
+        const dataServiceOfficialDynamic = await serviceOfficialDynamic.getDynamicList({
+            userId: dataSession.userInfo.userId
+        })
+        ctx.response.body = success({
+            msg: 'getDynmaicList',
+            data: {
+                dynamicList: dataServiceOfficialDynamic,
+            }
+        })
+    } else {
+        ctx.response.body = fail({
+            msg: 'getDynmaicList',
+            data: {
+                dynamicList: []
+            }
+        })
+    }
+}
+
 module.exports = {
+    'GET /rest/official/dynamic/getList': getList,
     'GET /rest/official/dynamic/focus': focus,
     'GET /rest/official/dynamic/share': share,
     'GET /rest/official/dynamic/infoShare': infoShare,

@@ -1,8 +1,8 @@
 /*
  * @Author: puxiao.wh 
  * @Date: 2017-10-11 11:05:54 
- * @Last Modified by:   puxiao.wh 
- * @Last Modified time: 2017-10-11 11:05:54 
+ * @Last Modified by: puxiao.wh
+ * @Last Modified time: 2017-10-18 14:32:08
  */
 
 /**
@@ -14,6 +14,16 @@ exports.getNewArray = (array, cb) => {
     if(array.length > 0) {
         for(let i = 0, l = array.length; i < l; i++) {
             _array.push(cb(array[i], i))
+        }
+    }
+    return _array
+}
+
+exports.getAsyncNewArray = async(array, cb) => {
+    const _array = []
+    if(array.length > 0) {
+        for(let i = 0, l = array.length; i < l; i++) {
+            _array.push(await cb(array[i], i))
         }
     }
     return _array

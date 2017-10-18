@@ -11,3 +11,11 @@ exports.setMapOfficialList = async() => {
     console.log('已添加数据之内存 global.mapOfficial = ', mapOfficial);
     global.mapOfficial = mapOfficial
 }
+
+exports.updateMapOfficialList = (options) => {
+    const mapOfficial = global.mapOfficial
+    global.mapOfficial = {
+        ...mapOfficial,
+        options
+    }
+}

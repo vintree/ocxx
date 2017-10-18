@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-16 01:49:52
+ * @Last Modified time: 2017-10-19 02:21:32
  */
 
 const log = require('../../config/log4js')
@@ -76,7 +76,7 @@ const get = async (ctx, next) => {
     })
 
     // 官方信息
-    const dataOfficial = await serviceOfficial.getOfficialInfo({
+    const dataOfficial = await serviceOfficial.getOfficialDetail({
         officialId: dataOfficialInfo.officialId
     })
 
@@ -120,6 +120,33 @@ const getOfficialAndOfficialInfoList = async (ctx, next) => {
     }
 }
 
+const getOfficialInfoList = async (ctx, next) => {
+    const { officialId, page, pageSize } = ctx.query
+    const dataOfficialInfoList = await serviceOfficialInfo.getOfficialInfoList({
+        officialId,
+        page,
+        pageSize
+    })
+    ctx.response.type ='application/json'
+    if(dataOfficialInfoList) {
+        ctx.response.body = success({
+            msg: 'getOfficialInfoList',
+            data: {
+                officialInfoList: dataOfficialInfoList,
+                success: true
+            }
+        })
+    } else {
+        ctx.response.body = fail({
+            msg: 'getOfficialInfoList',
+            data: {
+                officialInfoList: [],
+                success: true
+            }
+        })
+    }
+}
+
 const del = async (ctx, next) => {
     const { wxSessionCode, officialInfoId } = ctx.query
     const dataOfficialInfo = await serviceOfficialInfo.setDelete({
@@ -141,6 +168,7 @@ module.exports = {
     'GET /rest/official/info/create': create,
     'GET /rest/official/info/setOfficialInfo': setOfficialInfo,
     'GET /rest/official/info/getOfficialAndOfficialInfoList': getOfficialAndOfficialInfoList,
+    'GET /rest/official/info/getOfficialInfoList': getOfficialInfoList,
     'GET /rest/official/info/getTimeList': getTimeList,
     'GET /rest/official/info/get': get,
     'GET /rest/official/info/delete': del,

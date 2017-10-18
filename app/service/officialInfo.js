@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-15 20:29:57
+ * @Last Modified time: 2017-10-19 02:20:07
  */
 
 const mongo = require('mongodb')
@@ -16,6 +16,7 @@ const daoOfficial = require('../dao/official')
 const daoOfficialInfo = require('../dao/officialInfo')
 const daoOfficialUser = require('../dao/officialUser')
 const serviceOfficialUser = require('../service/officialUser')
+const serviceOfficial = require('../service/official')
 const loops = require('../utils/loops')
 const textCut = require('../utils/textCut')
 const time = require('../utils/time')
@@ -59,49 +60,49 @@ exports.create = async(options) => {
 }
 
 // 官方的信息
-exports.getOfficialInfoList = async(options) => {
-    try {
-        let officialInfoList = await daoOfficialInfo.get({
-            officialId: options.officialId,
-            isShow: true,
-            isActive: true
-        }, {}, {
-            create: 1
-        })
+// exports.getOfficialInfoList = async(options) => {
+//     try {
+//         let officialInfoList = await daoOfficialInfo.get({
+//             officialId: options.officialId,
+//             isShow: true,
+//             isActive: true
+//         }, {}, {
+//             create: 1
+//         })
 
-        const _officialInfoList = loops.getNewArray(officialInfoList, (item) => {
-            item.officialInfoId = item._id
-            item.officialInfoCutContent = item.officialInfoContent.length > 35 ? `${item.officialInfoContent.slice(0, 36)}...` : item.officialInfoContent
-            item.officialInfoCutContent = textCut.cut({
-                key: '1',
-                text: item.officialInfoContent
-            })
-            item.createRelative = time.relative(item.create)
-            item.createFull = time.full(item.create)
+//         const _officialInfoList = loops.getNewArray(officialInfoList, (item) => {
+//             item.officialInfoId = item._id
+//             item.officialInfoCutContent = item.officialInfoContent.length > 35 ? `${item.officialInfoContent.slice(0, 36)}...` : item.officialInfoContent
+//             item.officialInfoCutContent = textCut.cut({
+//                 key: '1',
+//                 text: item.officialInfoContent
+//             })
+//             item.createRelative = time.relative(item.create)
+//             item.createFull = time.full(item.create)
 
-            delete item._id
-            delete item.officialInfoContent
-            return item
-        })
+//             delete item._id
+//             delete item.officialInfoContent
+//             return item
+//         })
 
-        return success({
-            msg: 'getOfficialInfoList',
-            data: {
-                success: true,
-                officialInfoList: _officialInfoList
-            }
-        })
-    } catch(e) {
-        console.error(e)
-    }
-    return fail({
-        msg: 'getOfficialInfoList',
-        data: {
-            success: false,
-            officialInfoList: []
-        }
-    })
-}
+//         return success({
+//             msg: 'getOfficialInfoList',
+//             data: {
+//                 success: true,
+//                 officialInfoList: _officialInfoList
+//             }
+//         })
+//     } catch(e) {
+//         console.error(e)
+//     }
+//     return fail({
+//         msg: 'getOfficialInfoList',
+//         data: {
+//             success: false,
+//             officialInfoList: []
+//         }
+//     })
+// }
 
 // 时间流官方信息
 exports.getOfficialInfoTimeList = async(options) => {
@@ -119,7 +120,7 @@ exports.getOfficialInfoTimeList = async(options) => {
 
         let _officialInfoList = undefined
         if(officialInfoList) {
-            _officialInfoList = loops.getNewArray(officialInfoList, (item) => {
+            _officialInfoList = loops.getAsyncNewArray(officialInfoList, async(item) => {
                 item.officialInfoId = item._id
                 item.officialInfoCutContent = item.officialInfoContent.length > 35 ? `${item.officialInfoContent.slice(0, 36)}...` : item.officialInfoContent
                 item.officialInfoCutContent = textCut.cut({
@@ -130,6 +131,10 @@ exports.getOfficialInfoTimeList = async(options) => {
                 item.createFull = time.full(item.create)
                 
                 // 额外添加官方名称
+                // const dataOfficialDetail = await serviceOfficial.getOfficialDetail({
+                //     officialId: item.officialId
+                // })
+
                 item.officialName = global.mapOfficial[item.officialId].officialName
                 item.officialPic = global.mapOfficial[item.officialId].officialPic
 
@@ -179,7 +184,7 @@ exports.getInfo = async(options) => {
 exports.getOfficialAndOfficialInfoList = async(options) => {
     try {
         let dataOfficial = await daoOfficial.get({
-            _id: new ObjectID(options.officialId),
+            _id: options.officialId,
             isShow: true,
             isActive: true,
             isDelete: false
@@ -230,7 +235,6 @@ exports.getOfficialAndOfficialInfoList = async(options) => {
             data: {
                 success: true,
                 official: dataOfficial,
-                dataOfficial,
                 officialInfoList: _officialInfoList
             }
         })
@@ -245,6 +249,51 @@ exports.getOfficialAndOfficialInfoList = async(options) => {
             officialInfoList: []
         }
     })
+}
+
+exports.getOfficialInfoList = async(options) => {
+    const query = {
+        isShow: true,
+        isActive: true,
+        isDelete: false
+    }
+    if(options.officialId) {
+        query.officialId = options.officialId
+    }
+    let officialInfoList = await daoOfficialInfo.get(query, {
+        pageSize: options.pageSize,
+        page: options.page,
+    }, {
+        create: -1
+    })
+    console.log('officialInfoList', officialInfoList);
+    let _officialInfoList = undefined
+    if(officialInfoList) {
+        _officialInfoList = loops.getAsyncNewArray(officialInfoList, async(item) => {
+            item.officialInfoId = item._id
+            item.officialInfoCutContent = item.officialInfoContent.length > 35 ? `${item.officialInfoContent.slice(0, 36)}...` : item.officialInfoContent
+            item.officialInfoCutContent = textCut.cut({
+                key: '2',
+                text: item.officialInfoContent
+            })
+            item.createRelative = time.relative(item.create)
+            item.createFull = time.full(item.create)
+            
+            // 额外添加官方名称
+            // const dataOfficialDetail = await serviceOfficial.getOfficialDetail({
+            //     officialId: item.officialId
+            // })
+
+            item.officialName = global.mapOfficial[item.officialId].officialName
+            item.officialPic = global.mapOfficial[item.officialId].officialPic
+
+            delete item._id
+            delete item.officialInfoContent
+            return item
+        })
+        return _officialInfoList
+    }
+    return undefined
 }
 
 exports.setDelete = async(options) => {

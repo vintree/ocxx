@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-16 01:39:04
+ * @Last Modified time: 2017-10-18 14:27:16
  */
 const {
     success,
@@ -15,7 +15,7 @@ const serviceOfficialUser = require('../service/officialUser')
 const serviceOfficialDynamic = require('../service/officialDynamic')
 const loops = require('../utils/loops')
 
-exports.getOfficialInfo = async(options) => {
+exports.getOfficialDetail = async(options) => {
     const { officialId } = options
     let dataOfficial = await daoOfficial.get({
         _id: officialId,
@@ -114,7 +114,7 @@ exports.getMapOfficialList = async(qeury, find) => {
 
 exports.getOfficialInfoList = async(options) => {
     try {
-        let officialData = await daoOfficial.get({
+        let dataOfficialInfo = await daoOfficial.get({
             _id: options.officialId,
             isShow: true,
             isActive: true
@@ -137,7 +137,7 @@ exports.getOfficialInfoList = async(options) => {
             msg: 'getOfficialInfoList',
             data: {
                 success: true,
-                official: officialData,
+                official: dataOfficialInfo,
                 officialInfoCount: officialInfoList.length,
                 officialInfoList: officialInfoList
             }
@@ -154,4 +154,16 @@ exports.getOfficialInfoList = async(options) => {
             officialInfoList: []
         }
     })
+}
+
+exports.setOfficialInfo = async(options) => {
+    let dataOfficialInfo = await daoOfficial.set({
+        _id: options.officialId,
+    }, {
+        $set: {
+            ...options,
+            update: Date.parse(new Date())
+        }
+    })
+    return dataOfficialInfo
 }

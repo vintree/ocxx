@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-09 17:08:42
+ * @Last Modified time: 2017-10-17 13:18:55
  */
 const asyncHooks = require('async_hooks')
 const cheerio = require('cheerio')
@@ -14,7 +14,7 @@ const log = require('../../config/log4js')
 const {
     getOpenIdAndSeesionKey
 } = require('../service/wx/util')
-
+const { success, fail } = require('../utils/returnUtil')
 
 const uploadOfficialPic = async (ctx, next) => {
     const { req, res } = ctx
@@ -22,8 +22,28 @@ const uploadOfficialPic = async (ctx, next) => {
     const wxData = await getOpenIdAndSeesionKey(code)
     const sessionKey = wxData.sessionKey
     const openId = wxData.openId
-    // console.log(ctx.req.file.filename);
-    // console.log('sssss', wxData);
+
+    const { wxSession, officialId } = ctx.req.body
+    const dataSession = await serviceOfficialUser.wxDeSession({
+        wxSession
+    })
+    ctx.response.type ='application/json'
+    // 判断有权限账户
+    if(dataSession.userInfo.officialId === officialId) {
+        ctx.response.body = success({
+            msg: 'uploadOfficialPic',
+            data: {
+                officialPicUrl: 'https://baidu.com'
+            }
+        })
+    } else {
+        ctx.response.body = fail({
+            msg: 'uploadOfficialPic',
+            data: {
+                success: false
+            }
+        })
+    }
 }
 
 var getIcoList = async (ctx, next) => {

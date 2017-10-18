@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:06:07 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-13 03:37:27
+ * @Last Modified time: 2017-10-16 23:49:28
  */
 
 const mongo = require('mongodb')
@@ -73,4 +73,35 @@ exports.getCount = async (options) => {
     }
     db.close()
     return officialCount
+}
+
+exports.set = async (query = {}, update = {}, config = {}) => {
+    const db = await connect()
+    let dataUpdate = undefined
+    try {
+        if(query._id) {
+            query._id = new ObjectID(query._id)
+        }
+        // collection.findAndModify(query, sort, update, options, callback)
+        dataUpdate = await db.collection('official').findAndModify(
+            query,
+            [['_id', 'asc']],
+            update,
+            {
+                remove: false,
+                new: true
+            }
+        )
+    } catch(e) {
+        log.db.error(`tableName: officialInfo; function: get; info: ${e}`)
+        console.error(e)
+    }
+    // n: 1, nModified: 0, ok: 1
+    // n 表示找到条数  nModified 表示修改条数 ok 表示操作状态
+    db.close()
+    if(dataUpdate.n === 0) {
+        return undefined
+    } else {
+        return dataUpdate.value
+    }
 }

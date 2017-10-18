@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-14 21:17:46
+ * @Last Modified time: 2017-10-18 15:18:56
  */
 
 const mongo = require('mongodb')
@@ -73,6 +73,16 @@ exports.createOfficialInfoSupport = async(options) => {
 }
 
 // get --------------------------------------
+
+exports.getDynamicList = async(options) => {
+    const data = {
+        userId : options.userId,
+        isShow: true,
+        isActive: true,
+        isDelete: false
+    }
+    return await daoOfficialDynamic.get(data)
+}
 
 exports.getOfficialFocusCount = async(options) => {
     const data = {

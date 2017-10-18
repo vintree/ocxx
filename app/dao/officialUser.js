@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:06:07 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-13 00:52:44
+ * @Last Modified time: 2017-10-18 14:45:11
  */
 
 const mongo = require('mongodb');
@@ -38,6 +38,11 @@ exports.get = async (options = {}, projection = {}, sort = {}) => {
     const db = await connect()
     let officialUser = undefined
     let pageTotal = 0
+
+    if(options._id) {
+        options._id = new ObjectID(options._id)
+    }
+
     const page = Number(projection.page)
     const pageSize = Number(projection.pageSize)
 
