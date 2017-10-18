@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-18 14:46:18
+ * @Last Modified time: 2017-10-19 02:38:26
  */
 
 const log = require('../../config/log4js')
@@ -26,7 +26,6 @@ const createOrUpdate = async (ctx, next) => {
         code: ctx.query.code
     }
     const officialUserData = await serviceOfficialUser.createUser(sqlObj, auxObj)
-    // console.log('officialUserDatas', officialUserData);
     if(officialUserData.code === 200) {
         ctx.response.type ='application/json'
         ctx.response.body = {

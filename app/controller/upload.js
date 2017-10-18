@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-17 13:18:55
+ * @Last Modified time: 2017-10-19 02:38:23
  */
 const asyncHooks = require('async_hooks')
 const cheerio = require('cheerio')
@@ -86,7 +86,6 @@ var getIcoList = async (ctx, next) => {
 
 var getIcoDetail = async (ctx, next) => {
     const startTime = new Date()
-    console.log('query', ctx.query);
     const icoDetail = await serviceico.getIcoDetail({
         _id: ctx.query.icoId
     })

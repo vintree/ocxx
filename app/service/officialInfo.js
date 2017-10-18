@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 02:20:07
+ * @Last Modified time: 2017-10-19 02:38:08
  */
 
 const mongo = require('mongodb')
@@ -266,7 +266,7 @@ exports.getOfficialInfoList = async(options) => {
     }, {
         create: -1
     })
-    console.log('officialInfoList', officialInfoList);
+
     let _officialInfoList = undefined
     if(officialInfoList) {
         _officialInfoList = loops.getAsyncNewArray(officialInfoList, async(item) => {

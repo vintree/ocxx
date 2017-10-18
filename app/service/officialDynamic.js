@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-18 15:18:56
+ * @Last Modified time: 2017-10-19 02:38:14
  */
 
 const mongo = require('mongodb')
@@ -167,7 +167,6 @@ exports.getUserInfoSupportCount = async(options) => {
 // get --------------------------------------
 
 exports.getUserInfoSupport = async(options) => {
-    console.log('options', options);
     const query = {
         userId: options.userId,
         officialInfoId: options.officialInfoId,
@@ -181,7 +180,6 @@ exports.getUserInfoSupport = async(options) => {
 }
 
 exports.getOfficialFocus = async(options) => {
-    console.log('options', options);
     const query = {
         userId: options.userId,
         officialId: options.officialId,

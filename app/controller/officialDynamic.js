@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-18 15:24:33
+ * @Last Modified time: 2017-10-19 02:38:36
  */
 
 const asyncHooks = require('async_hooks')
@@ -16,15 +16,10 @@ const { success, fail } = require('../utils/returnUtil')
 
 const focus = async (ctx, next) => {
     const { wxSessionCode, officialId } = ctx.query
-
-    console.log('ctx.query', ctx.query);
-
     const dataUser = await serviceOfficialUser.getUserInfo({
         wxSessionCode
     })
     let options = {}
-
-    console.log('dataUser', dataUser);
 
     if(dataUser) {
         options = {
@@ -33,13 +28,8 @@ const focus = async (ctx, next) => {
         }
     }
 
-    console.log('options', options);
-
     // 新增添加
     const dataOfficialDynamic = await serviceOfficialDynamic.createOfficialFocus(options)
-    
-    console.log('dataOfficialDynamic', dataOfficialDynamic);
-
     ctx.response.type ='application/json'
     if(dataOfficialDynamic) {
         ctx.response.body = success({
@@ -177,7 +167,7 @@ const getList = async (ctx, next) => {
     const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
-    console.log('dataSession', dataSession);
+
     ctx.response.type ='application/json'    
     if(dataSession) {
         const dataServiceOfficialDynamic = await serviceOfficialDynamic.getDynamicList({
