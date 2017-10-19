@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 15:48:30
+ * @Last Modified time: 2017-10-19 15:59:06
  */
 
 const serviceOfficialUser = require('../service/officialUser')
@@ -18,7 +18,7 @@ const uploadOfficialPic = async (ctx, next) => {
     const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
-    const officialPicUrl = `https://pic.ieee.top/official/${filename}`
+    const officialPicUrl = `https://pic.ieee.top/official/official/${filename}`
     ctx.response.type ='application/json'
     // 判断有权限账户
     if(dataSession.userInfo.officialId === officialId) {

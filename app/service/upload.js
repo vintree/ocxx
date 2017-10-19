@@ -13,7 +13,7 @@ exports.uploadFile = () => {
             const { wxSession } = req.body
             const md5 = require('md5')
             var fileFormat = (file.originalname).split(".");
-            const fileName = md5(Date.now() + wxSession + '_official_') + "==." + fileFormat[fileFormat.length - 1]
+            const fileName = md5(Date.now() + wxSession + '_official_') + "_official_." + fileFormat[fileFormat.length - 1]
             cb(null, fileName);
         }
     })
