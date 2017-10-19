@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:06:07 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-18 14:45:11
+ * @Last Modified time: 2017-10-19 15:38:38
  */
 
 const mongo = require('mongodb');
@@ -66,30 +66,61 @@ exports.get = async (options = {}, projection = {}, sort = {}) => {
 }
 
 // exports.set = async ((query = {}, update = {}, config = {}) => {
-    // const db = await connect()
-    // let dataOfficialUser = {}
-    // try {
-    //     let dataOfficialUser = await db.collection('officialUser').findOne({ openId: options.openId })
-    //     if(dataOfficialUser) {
-    //         dataOfficialUser = Object.assign({}, dataOfficialUser, options)
-    //         await db.collection('officialUser').save(dataOfficialUser)
-    //     } else {
-    //         options.createTime = Date.parse(new Date())
-    //         await db.collection('officialUser').ensureIndex({
-    //             openId: 1,
-    //             isActive: 1
-    //         }, {
-    //             unique: true, 
-    //             background: true, 
-    //             dropDups: true
-    //         })
-    //         dataOfficialUser = await db.collection('officialUser').insert(options)
-    //         dataOfficialUser = dataOfficialUser.ops[0]
-    //     }
-    // } catch(e) {
-    //     log.db.error(`tableName: officialUser; function: created; info: ${e};`)
-    //     console.error(e)
-    // }
-    // db.close()    
-    // return dataOfficialUser
+//     const db = await connect()
+//     let dataOfficialUser = {}
+//     try {
+//         let dataOfficialUser = await db.collection('officialUser').findOne({ openId: options.openId })
+//         if(dataOfficialUser) {
+//             dataOfficialUser = Object.assign({}, dataOfficialUser, options)
+//             await db.collection('officialUser').save(dataOfficialUser)
+//         } else {
+//             options.createTime = Date.parse(new Date())
+//             await db.collection('officialUser').ensureIndex({
+//                 openId: 1,
+//                 isActive: 1
+//             }, {
+//                 unique: true, 
+//                 background: true, 
+//                 dropDups: true
+//             })
+//             dataOfficialUser = await db.collection('officialUser').insert(options)
+//             dataOfficialUser = dataOfficialUser.ops[0]
+//         }
+//     } catch(e) {
+//         log.db.error(`tableName: officialUser; function: created; info: ${e};`)
+//         console.error(e)
+//     }
+//     db.close()    
+//     return dataOfficialUser
 // })
+
+exports.set = async (query = {}, update = {}, config = {}) => {
+    const db = await connect()
+    let dataUpdate = undefined
+    try {
+        if(query._id) {
+            query._id = new ObjectID(query._id)
+        }
+        // collection.findAndModify(query, sort, update, options, callback)
+        dataUpdate = await db.collection('officialUser').findAndModify(
+            query,
+            [['_id', 'asc']],
+            update,
+            {
+                remove: false,
+                new: true
+            }
+        )
+    } catch(e) {
+        log.db.error(`tableName: officialUser; function: get; info: ${e}`)
+        console.error(e)
+    }
+    // n: 1, nModified: 0, ok: 1
+    // n 表示找到条数  nModified 表示修改条数 ok 表示操作状态
+    db.close()
+    if(dataUpdate.n === 0) {
+        return undefined
+    } else {
+        return dataUpdate.value
+    }
+}

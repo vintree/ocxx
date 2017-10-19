@@ -6,15 +6,15 @@ exports.uploadFile = () => {
     var storage = multer.diskStorage({  
         //文件保存路径  
         destination: function (req, file, cb) {
-                cb(null, global.config.officialPicPath)
+            cb(null, global.config.officialPicPath)
         },  
         //修改文件名称  
         filename: async(req, file, cb) => {  
-            const { code } = req.body
+            const { wxSession } = req.body
             const md5 = require('md5')
             var fileFormat = (file.originalname).split(".");
-            const fileName = md5(Date.now() + code + 'official==//\\')
-            cb(null, fileName + "==." + fileFormat[fileFormat.length - 1]);
+            const fileName = md5(Date.now() + wxSession + '_official_') + "==." + fileFormat[fileFormat.length - 1]
+            cb(null, fileName);
         }
     })
     //加载配置

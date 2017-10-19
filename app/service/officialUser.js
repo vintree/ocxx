@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-18 14:45:36
+ * @Last Modified time: 2017-10-19 15:39:22
  */
 const { getOpenIdAndSeesionKey } = require('./wx/util')
 const { success, fail } = require('../utils/returnUtil')
@@ -11,7 +11,6 @@ const mongo = require('mongodb')
 
 exports.create = async (options) => {    
     const dataWX = await getOpenIdAndSeesionKey(options.wxSessionCode)
-    
     const save = {
         wxOpenId: dataWX.openId,
         phone, 
@@ -22,9 +21,7 @@ exports.create = async (options) => {
         country, 
         avatarUrl
     } = options
-
     const dataOfficialUser = await daoOfficialUser.create(save)
-
     if(dataOfficialUser) {
         return success({
             msg: 'create',
@@ -39,6 +36,9 @@ exports.create = async (options) => {
             userInfo: dataOfficialUser || {}
         }
     })
+}
+
+exports.setUserInfo = async(query, update) => {
 
 }
 
