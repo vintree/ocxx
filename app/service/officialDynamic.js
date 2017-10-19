@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 02:38:14
+ * @Last Modified time: 2017-10-19 23:34:00
  */
 
 const mongo = require('mongodb')
@@ -181,8 +181,8 @@ exports.getUserInfoSupport = async(options) => {
 
 exports.getOfficialFocus = async(options) => {
     const query = {
-        userId: options.userId,
-        officialId: options.officialId,
+        userId: options.userId + '',
+        officialId: options.officialId + '',
         typeCode: 1003,
         isShow: true,
         isActive: true,

@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 02:38:36
+ * @Last Modified time: 2017-10-19 23:56:03
  */
 
 const asyncHooks = require('async_hooks')
@@ -15,15 +15,15 @@ const serviceOfficialInfo = require('../service/officialInfo')
 const { success, fail } = require('../utils/returnUtil')
 
 const focus = async (ctx, next) => {
-    const { wxSessionCode, officialId } = ctx.query
-    const dataUser = await serviceOfficialUser.getUserInfo({
-        wxSessionCode
+    const { wxSession, officialId } = ctx.query
+    const dataUser = await serviceOfficialUser.wxDeSession({
+        wxSession
     })
     let options = {}
 
-    if(dataUser) {
+    if(dataUser.userInfo) {
         options = {
-            userId: dataUser.userId,
+            userId: dataUser.userInfo.userId,
             officialId : officialId
         }
     }

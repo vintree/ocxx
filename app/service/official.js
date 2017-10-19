@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 17:36:54
+ * @Last Modified time: 2017-10-19 23:34:26
  */
 const {
     success,
@@ -67,10 +67,10 @@ exports.getOfficialList = async(options) => {
         // 格式化官方列表
         let _dataOfficialList = undefined
         if(dataOfficialList) {
-            _dataOfficialList = loops.getNewArray(dataOfficialList, (dataOfficialItem, i) => {
+            _dataOfficialList = loops.getAsyncNewArray(dataOfficialList, async(dataOfficialItem, i) => {
                 dataOfficialItem.isOfficialFocus = false
                 if(userId) {
-                    const dataOfficialFocus = serviceOfficialDynamic.getOfficialFocus({
+                    const dataOfficialFocus = await serviceOfficialDynamic.getOfficialFocus({
                         userId: userId,
                         officialId: dataOfficialItem._id
                     })
