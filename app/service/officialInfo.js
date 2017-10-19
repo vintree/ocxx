@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 17:40:52
+ * @Last Modified time: 2017-10-19 21:54:37
  */
 
 const mongo = require('mongodb')
@@ -131,12 +131,14 @@ exports.getOfficialInfoTimeList = async(options) => {
                 item.createFull = time.full(item.create)
                 
                 // 额外添加官方名称
-                // const dataOfficialDetail = await serviceOfficial.getOfficialDetail({
-                //     officialId: item.officialId
-                // })
+                const dataOfficialDetail = await serviceOfficial.getOfficialDetail({
+                    officialId: item.officialId
+                })
+                item.officialName = dataOfficialDetail.officialName
+                item.officialPicUrl = dataOfficialDetail.officialPicUrl
 
-                item.officialName = global.mapOfficial[item.officialId].officialName
-                item.officialPicUrl = global.mapOfficial[item.officialId].officialPicUrl
+                // item.officialName = global.mapOfficial[item.officialId].officialName
+                // item.officialPicUrl = global.mapOfficial[item.officialId].officialPicUrl
 
                 delete item._id
                 delete item.officialInfoContent
@@ -280,12 +282,14 @@ exports.getOfficialInfoList = async(options) => {
             item.createFull = time.full(item.create)
             
             // 额外添加官方名称
-            // const dataOfficialDetail = await serviceOfficial.getOfficialDetail({
-            //     officialId: item.officialId
-            // })
+            const dataOfficialDetail = await serviceOfficial.getOfficialDetail({
+                officialId: item.officialId
+            })
+            item.officialName = dataOfficialDetail.officialName
+            item.officialPicUrl = dataOfficialDetail.officialPicUrl
 
-            item.officialName = global.mapOfficial[item.officialId].officialName
-            item.officialPicUrl = global.mapOfficial[item.officialId].officialPicUrl
+            // item.officialName = global.mapOfficial[item.officialId].officialName
+            // item.officialPicUrl = global.mapOfficial[item.officialId].officialPicUrl
 
             delete item._id
             delete item.officialInfoContent
