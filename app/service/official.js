@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 02:49:43
+ * @Last Modified time: 2017-10-19 17:36:54
  */
 const {
     success,
@@ -39,8 +39,6 @@ exports.getOfficialDetail = async(options) => {
             })
             dataOfficial.isOfficialFocus = !!dataOfficialFocus
         }
-
-
 
         dataOfficial.officialId = dataOfficial._id
         delete dataOfficial._id
@@ -101,7 +99,7 @@ exports.getMapOfficialList = async(qeury, find) => {
             isDelete: false
         }, {
             officialName: 1,
-            officialPic: 1
+            officialPicUrl: 1
         }, {
             create: -1
         })
@@ -132,7 +130,7 @@ exports.getOfficialInfoList = async(options) => {
             officialDes: 1,
             officialFullSupport: 1,
             officialFocus: 1,
-            officialPic: 1
+            officialPicUrl: 1
         })
         
         let officialInfoList = await daoOfficialInfo.get({

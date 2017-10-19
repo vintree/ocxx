@@ -62,7 +62,7 @@ const getOfficialDetail = async (ctx, next) => {
 }
 
 const setOfficialInfo = async(ctx) => {
-    const { wxSession, officialId, officialAddress, officialDoorplate, officialDes, officialEmail, officialFullName, officialLat, officialLog, officialName, officialPhone, officialPic } = ctx.query
+    const { wxSession, officialId, officialAddress, officialDoorplate, officialDes, officialEmail, officialFullName, officialLat, officialLog, officialName, officialPhone, officialPicUrl } = ctx.query
     const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
@@ -70,7 +70,7 @@ const setOfficialInfo = async(ctx) => {
     // 判断有权限账户
     if(dataSession.userInfo.officialId === officialId) {
         const dataSetOfficialInfo = await serviceOfficial.setOfficialInfo({
-            officialId, officialAddress, officialDoorplate, officialDes, officialEmail, officialFullName, officialLat, officialLog, officialName, officialPhone, officialPic
+            officialId, officialAddress, officialDoorplate, officialDes, officialEmail, officialFullName, officialLat, officialLog, officialName, officialPhone, officialPicUrl
         })
         ctx.response.body = success({
             msg: 'setOfficialInfo',

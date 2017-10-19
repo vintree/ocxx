@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 15:59:06
+ * @Last Modified time: 2017-10-19 16:07:18
  */
 
 const serviceOfficialUser = require('../service/officialUser')
@@ -11,7 +11,7 @@ const log = require('../../config/log4js')
 const { success, fail } = require('../utils/returnUtil')
 
 const uploadOfficialPic = async (ctx, next) => {
-    // console.log('ss============', ctx.req.file);
+    console.log('ss============', ctx.req.file);
     const { filename } = ctx.req.file
 
     const { wxSession, officialId } = ctx.req.body

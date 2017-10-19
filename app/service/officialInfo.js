@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 02:38:08
+ * @Last Modified time: 2017-10-19 17:40:52
  */
 
 const mongo = require('mongodb')
@@ -136,7 +136,7 @@ exports.getOfficialInfoTimeList = async(options) => {
                 // })
 
                 item.officialName = global.mapOfficial[item.officialId].officialName
-                item.officialPic = global.mapOfficial[item.officialId].officialPic
+                item.officialPicUrl = global.mapOfficial[item.officialId].officialPicUrl
 
                 delete item._id
                 delete item.officialInfoContent
@@ -194,7 +194,7 @@ exports.getOfficialAndOfficialInfoList = async(options) => {
             officialDes: 1,
             officialFullSupport: 1,
             officialFocus: 1,
-            officialPic: 1
+            officialPicUrl: 1
         })
 
         dataOfficial = dataOfficial[0]
@@ -285,7 +285,7 @@ exports.getOfficialInfoList = async(options) => {
             // })
 
             item.officialName = global.mapOfficial[item.officialId].officialName
-            item.officialPic = global.mapOfficial[item.officialId].officialPic
+            item.officialPicUrl = global.mapOfficial[item.officialId].officialPicUrl
 
             delete item._id
             delete item.officialInfoContent

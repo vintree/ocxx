@@ -64,7 +64,7 @@ exports.getCirleOfficialList = async(options) => {
             officialDes: 1,
             officialFullSupport: 1,
             officialFocus: 1,
-            officialPic: 1
+            officialPicUrl: 1
         })
         const _officialList = []
         for(let i = 0, l = officialList.length; i < l; i++) {
