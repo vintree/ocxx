@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 02:38:26
+ * @Last Modified time: 2017-10-21 16:49:28
  */
 
 const log = require('../../config/log4js')
@@ -42,7 +42,6 @@ const createOrUpdate = async (ctx, next) => {
 
 // 未注册用户自动注册
 const valid = async (ctx, next) => {
-    // const { wxSession, phone, nickName, gender, province, city, country, avatarUrl } = ctx.query
     const { wxSession } = ctx.query
 
     // 获取用户信息
@@ -57,6 +56,23 @@ const valid = async (ctx, next) => {
     ctx.response.type ='application/json'
     // 找到用户
     if(dataSession) {
+        let officialActiveMsg = ''
+        // 0 = 已申请已激活、1 = 未申请、2 = 已申请未通过、3 = 已申请未激活
+        switch(dataOfficialUser.officialActiveCode) {
+            case 0: 
+                officialActiveMsg = '已通过已激活'
+                break;
+            case 1: 
+                officialActiveMsg = '未申请'
+                break;
+            case 2: 
+                officialActiveMsg = '已申请未通过'
+                break;
+            case 3: 
+                officialActiveMsg = '已申请未激活'
+                break;
+        }
+        console.log('officialActiveMsg', officialActiveMsg);
         ctx.response.body = success({
             msg: 'getUser',
             data: {
@@ -69,7 +85,9 @@ const valid = async (ctx, next) => {
                     officialId: dataOfficialUser.officialId,
                     phone: dataOfficialUser.phone,
                     province: dataOfficialUser.province,
-                    userId: dataOfficialUser.userId
+                    userId: dataOfficialUser.userId,
+                    officialActiveCode: dataOfficialUser.officialActiveCode,
+                    officialActiveMsg: officialActiveMsg
                 }
             }
         })

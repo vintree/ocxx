@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 15:39:22
+ * @Last Modified time: 2017-10-21 19:58:21
  */
 const { getOpenIdAndSeesionKey } = require('./wx/util')
 const { success, fail } = require('../utils/returnUtil')
@@ -11,7 +11,7 @@ const mongo = require('mongodb')
 
 exports.create = async (options) => {    
     const dataWX = await getOpenIdAndSeesionKey(options.wxSessionCode)
-    const save = {
+    let save = {
         wxOpenId: dataWX.openId,
         phone, 
         nickName, 
@@ -19,8 +19,18 @@ exports.create = async (options) => {
         province, 
         city, 
         country, 
-        avatarUrl
+        avatarUrl,
     } = options
+
+    save = {
+        ...save,
+        isShow: true,
+        isActive: true,
+        isDelete: false,
+        // 0 = 已申请已激活、1 = 未申请、2 = 已申请未通过、3 = 已申请未激活
+        officialActiveCode: 1
+    }
+
     const dataOfficialUser = await daoOfficialUser.create(save)
     if(dataOfficialUser) {
         return success({
@@ -39,7 +49,18 @@ exports.create = async (options) => {
 }
 
 exports.setUserInfo = async(query, update) => {
-
+    let dataOfficial = undefined
+    // 获取合法用户 && 获取 officialId
+    query = {
+        _id : query.userId.toString()
+    }
+    update = {
+        $set: {
+            ...update
+        }
+    }
+    dataOfficial = await daoOfficialUser.set(query, update, {})
+    return dataOfficial
 }
 
 // 切勿再次使用，查询用户是否存在

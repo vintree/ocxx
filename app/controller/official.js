@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 02:49:05
+ * @Last Modified time: 2017-10-21 21:47:31
  */
 
 const _ = require('../utils/request')
@@ -12,15 +12,94 @@ const log = require('../../config/log4js')
 const { success, fail } = require('../utils/returnUtil')
 const serviceOfficialUser = require('../service/officialUser')
 
+const create = async (ctx, next) => {
+    ctx.response.type ='application/json'
+    const { 
+        wxSession,
+        circleId,
+        officialName,
+        officialFullName,
+        officialEmail,
+        officialPhone,
+        officialDes,
+        officialLat,
+        officialLog,
+        officialAddress,
+        officialDoorplate,
+        officialPicUrl
+    } = ctx.query
+    
+    const dataSession = await serviceOfficialUser.wxDeSession({
+        wxSession
+    })
+    
+    const dataUser = await serviceOfficialUser.getUserDetail({
+        userId: dataSession.userInfo.userId
+    })
+
+    let officialId = undefined
+    if(dataUser) {
+        console.log('1');
+        console.log('object', dataUser.officialId);
+        if(!dataUser.officialId) {
+            console.log('2', dataUser);
+            // 创建机构
+            const dataCreate = await serviceOfficial.create({
+                circleId,
+                officialName,
+                officialFullName,
+                officialEmail,
+                officialPhone,
+                officialDes,
+                officialLat,
+                officialLog,
+                officialAddress,
+                officialDoorplate,
+                officialPicUrl
+            })
+            // 机构挂在到用户
+            if(dataCreate) {
+                console.log('3', dataCreate);
+                const dataUserInfo = await serviceOfficialUser.setUserInfo({
+                    userId: dataUser.userId
+                }, {
+                    officialId: dataCreate.officialId.toString()
+                })
+
+                console.log('dataUserInfo==', dataUserInfo);
+
+                if(dataUserInfo) {
+                    console.log('4', dataUserInfo);
+                    ctx.response.body = success({
+                        msg: 'createOfficial',
+                        data: {
+                            success: true
+                        }
+                    })
+                }
+            }
+        }
+    }
+    console.log('end');
+    // ctx.response.body = fail({
+    //     msg: 'createOfficialInfo',
+    //     data: {
+    //         success: false
+    //     }
+    // })
+}
+
 const getList = async (ctx, next) => {
-    const { circleId, wxSession } = ctx.query
+    const { circleId, wxSession, page, pageSize } = ctx.query
     const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
 
     const dataOfficialList = await serviceOfficial.getOfficialList({
         circleId,
-        userId: dataSession.userInfo.userId
+        userId: dataSession.userInfo.userId,
+        page,
+        pageSize
     })
     ctx.response.type ='application/json'
     ctx.response.body = success({
@@ -89,6 +168,7 @@ const setOfficialInfo = async(ctx) => {
 }
 
 module.exports = {
+    'GET /rest/official/create': create,
     'GET /rest/official/getList': getList,
     'GET /rest/official/getOfficialDetail': getOfficialDetail,
     'GET /rest/official/setOfficialInfo': setOfficialInfo

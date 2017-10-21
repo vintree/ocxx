@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 14:41:25
+ * @Last Modified time: 2017-10-21 15:47:57
  */
 
 // const daoOfficial = require('../dao/official')
@@ -22,10 +22,10 @@ exports.getWxUnlimit = async(options) => {
     // 二维码在50 - 200 之间
     wxWidth = wxWidth < 50 ? 50 : wxWidth
     wxWidth = wxWidth > 200 ? 200 : wxWidth
+    console.log('wxWidth', wxWidth);
     let dataWxUnlimit = await getWXSmallUnlimit({
         wxScene, wxPage, wxWidth, wxAutoColor, wxLineColor
     })
-    console.log('dataWxUnlimit', dataWxUnlimit);
     let dataWxUnlimitUrl = dataWxUnlimit.replace(global.config.officialQrcodePicPath, 'https://pic.ieee.top/official/qrcode/')
     return dataWxUnlimitUrl
 }

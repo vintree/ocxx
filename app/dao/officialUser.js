@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:06:07 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 15:38:38
+ * @Last Modified time: 2017-10-21 16:39:11
  */
 
 const mongo = require('mongodb');
@@ -15,7 +15,7 @@ exports.create = async (save) => {
     const db = await connect()
     let dataOfficialUser = undefined
     try {
-        save.createTime = Date.parse(new Date())
+        save.create = Date.parse(new Date())
         // await db.collection('officialUser').ensureIndex({
         //     openId: 1,
         //     isActive: 1

@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:06:07 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-16 23:49:28
+ * @Last Modified time: 2017-10-21 19:50:03
  */
 
 const mongo = require('mongodb')
@@ -11,35 +11,36 @@ const ObjectID = mongo.ObjectID
 const mongoClient = mongo.MongoClient
 const log = require('../../config/log4js')
 
-// exports.created = async (options) => {
-//     const db = await connect()
-//     let icoList = []
-//     options.create = Date.parse(new Date())
-//     try {
-//         icoList = await db.collection('official').insert(options)
-//         await db.collection('official').ensureIndex({
-//             circleName: 1,
-//             isShow: 1,
-//             isActive: 1
-//         }, {
-//             unique: true, 
-//             background: true, 
-//             dropDups: true
-//         })
-//     } catch(e) {
-//         log.db.error(`tableName: official; function: created; info: ${e};`)
-//         console.error(e)
-//     }
-//     db.close()
-//     return icoList
-// }
+exports.create = async (save) => {
+    const db = await connect()
+    let dbData = []
+    save.create = Date.parse(new Date())
+    try {
+        dbData = await db.collection('official').insert(save)
+        dbData = dbData.ops
+        // await db.collection('official').ensureIndex({
+        //     circleName: 1,
+        //     isShow: 1,
+        //     isActive: 1
+        // }, {
+        //     unique: true, 
+        //     background: true, 
+        //     dropDups: true
+        // })
+    } catch(e) {
+        log.db.error(`tableName: official; function: created; info: ${e};`)
+        console.error(e)
+    }
+    db.close()
+    return dbData
+}
 
 exports.get = async (options = {}, projection = {}, sort = {}) => {
     const db = await connect()
     let official = {}
     let pageTotal = 0
     if(options._id) {
-        options._id = new ObjectID(options._id)
+        options._id = new ObjectID(options._id || '')
     }
 
     const page = Number(projection.page)

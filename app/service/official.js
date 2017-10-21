@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 23:34:26
+ * @Last Modified time: 2017-10-21 21:48:13
  */
 const {
     success,
@@ -15,22 +15,52 @@ const serviceOfficialUser = require('../service/officialUser')
 const serviceOfficialDynamic = require('../service/officialDynamic')
 const loops = require('../utils/loops')
 
+exports.create = async(options) => {
+    const save = {
+        "circleId" : options.circleId,
+        "officialName" : options.officialName,
+        "officialFullName" : options.officialFullName,
+        "officialDes" : options.officialDes,
+        "officialPicUrl" : options.officialPicUrl,
+        "officialFullSupport" : 0,
+        "officialFullShare" : 0,
+        "officialFocus" : 0,
+        "officialEmail" : options.officialEmail,
+        "officialPhone" : options.officialPhone,
+        "officialAddress" : options.officialAddress,
+        "officialDoorplate" : options.officialDoorplate,
+        "officialLat" : options.officialLat,
+        "officialLog" : options.officialLog,
+        "isActive" : false,
+        "isShow" : true,
+        "isDelete" : false,
+        "update" : Date.parse(new Date())
+    }
+    // 创建消息
+    const dataCreateOfficialInfo = await daoOfficial.create(save)
+    if(dataCreateOfficialInfo) {
+        return {
+            officialId: dataCreateOfficialInfo[0]._id
+        }
+    }
+    return undefined
+}
+
 exports.getOfficialDetail = async(options) => {
     const { officialId, userId } = options
     let dataOfficial = await daoOfficial.get({
         _id: officialId,
         isShow: true,
-        isActive: true,
+        // isActive: true,
         isDelete: false
     }, {
-        isActive: 0,
+        // isActive: 0,
         isShow: 0,
         isDelete: 0
     })
 
     if(dataOfficial) {
         dataOfficial = dataOfficial[0]
-
         dataOfficial.isOfficialFocus = false
         if(userId) {
             const dataOfficialFocus = await serviceOfficialDynamic.getOfficialFocus({
@@ -48,7 +78,7 @@ exports.getOfficialDetail = async(options) => {
 }
 
 exports.getOfficialList = async(options) => {
-    const { userId, circleId } = options
+    const { userId, circleId, page, pageSize } = options
     try {
         // 获取官方信息
         const dataOfficialList = await daoOfficial.get({
@@ -59,7 +89,9 @@ exports.getOfficialList = async(options) => {
         }, {
             isActive: 0,
             isDelete: 0,
-            isShow: 0
+            isShow: 0,
+            page: page || 1,
+            pageSize: pageSize || 10
         }, {
             create: 1
         })
