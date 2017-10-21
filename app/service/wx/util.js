@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-10-09 00:27:08 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 15:32:07
+ * @Last Modified time: 2017-10-21 15:43:06
  */
 
 const _ = require('../../utils/request')
@@ -71,7 +71,7 @@ exports.getWXSmallUnlimit = async(options) => {
             method: 'POST', 
             body: JSON.stringify(params),
         })
-        let dest = fs.createWriteStream(`${global.config.officialQrcodePicPath}${wxPage.replace(/\//g,'_')}%${wxScene}%.png`);
+        let dest = fs.createWriteStream(`${global.config.officialQrcodePicPath}${wxPage.replace(/\//g,'_')}__${wxScene}__.png`);
         const dataPipe = res.body.pipe(dest);
         return dataPipe.path
     }

@@ -49,7 +49,7 @@ module.exports = function (dir) {
     addControllers(router, controllersDir);
 
     // 官方数据放置内存
-    main.setMapOfficialList()
+    // main.setMapOfficialList()
 
     return router.routes();
 };
