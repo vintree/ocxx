@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 21:47:31
+ * @Last Modified time: 2017-10-22 02:49:08
  */
 
 const _ = require('../utils/request')
@@ -146,8 +146,14 @@ const setOfficialInfo = async(ctx) => {
         wxSession
     })
     ctx.response.type ='application/json'
+
+    // 获取用户官方信息
+    const dataUserInfo = await serviceOfficialUser.getUserDetail({
+        userId: dataSession.userInfo.userId
+    })
+
     // 判断有权限账户
-    if(dataSession.userInfo.officialId === officialId) {
+    if(dataUserInfo.officialId === officialId) {
         const dataSetOfficialInfo = await serviceOfficial.setOfficialInfo({
             officialId, officialAddress, officialDoorplate, officialDes, officialEmail, officialFullName, officialLat, officialLog, officialName, officialPhone, officialPicUrl
         })
