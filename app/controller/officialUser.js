@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 16:49:28
+ * @Last Modified time: 2017-10-22 02:17:20
  */
 
 const log = require('../../config/log4js')
@@ -42,55 +42,43 @@ const createOrUpdate = async (ctx, next) => {
 
 // 未注册用户自动注册
 const valid = async (ctx, next) => {
+    ctx.response.type ='application/json'
     const { wxSession } = ctx.query
-
     // 获取用户信息
     const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
 
-    const dataOfficialUser = await serviceOfficialUser.getUserDetail({
-        userId: dataSession.userInfo.userId
-    })
-
-    ctx.response.type ='application/json'
-    // 找到用户
-    if(dataSession) {
-        let officialActiveMsg = ''
-        // 0 = 已申请已激活、1 = 未申请、2 = 已申请未通过、3 = 已申请未激活
-        switch(dataOfficialUser.officialActiveCode) {
-            case 0: 
-                officialActiveMsg = '已通过已激活'
-                break;
-            case 1: 
-                officialActiveMsg = '未申请'
-                break;
-            case 2: 
-                officialActiveMsg = '已申请未通过'
-                break;
-            case 3: 
-                officialActiveMsg = '已申请未激活'
-                break;
-        }
-        console.log('officialActiveMsg', officialActiveMsg);
-        ctx.response.body = success({
-            msg: 'getUser',
-            data: {
-                userInfo: {
-                    avatarUrl: dataOfficialUser.avatarUrl,
-                    city: dataOfficialUser.city,
-                    country: dataOfficialUser.country,
-                    gender: dataOfficialUser.gender,
-                    nickName: dataOfficialUser.nickName,
-                    officialId: dataOfficialUser.officialId,
-                    phone: dataOfficialUser.phone,
-                    province: dataOfficialUser.province,
-                    userId: dataOfficialUser.userId,
-                    officialActiveCode: dataOfficialUser.officialActiveCode,
-                    officialActiveMsg: officialActiveMsg
-                }
-            }
+    if(dataSession.userInfo) {
+        const dataOfficialUser = await serviceOfficialUser.getUserDetail({
+            userId: dataSession.userInfo.userId
         })
+        // 找到用户
+        if(dataOfficialUser) {
+            ctx.response.body = success({
+                msg: 'getUser',
+                data: {
+                    userInfo: {
+                        avatarUrl: dataOfficialUser.avatarUrl,
+                        city: dataOfficialUser.city,
+                        country: dataOfficialUser.country,
+                        gender: dataOfficialUser.gender,
+                        nickName: dataOfficialUser.nickName,
+                        officialId: dataOfficialUser.officialId,
+                        phone: dataOfficialUser.phone,
+                        province: dataOfficialUser.province,
+                        userId: dataOfficialUser.userId,
+                    }
+                }
+            })
+        } else {
+            ctx.response.body = fail({
+                msg: 'getUser',
+                data: {
+                    userInfo: {}
+                }
+            })
+        }
     } else {
         ctx.response.body = fail({
             msg: 'getUser',
@@ -99,45 +87,55 @@ const valid = async (ctx, next) => {
             }
         })
     }
-    // else {
-    //     // 注册用户
-    //     if(dataUser.wxOpenId) {
-    //         const dataCreateUser = await serviceOfficialUser.create({
-    //             wxSessionCode, phone, nickName, gender, province, city, country, avatarUrl
-    //         })
-    //         if(dataCreateUser.code === 200) {
-    //             ctx.response.body = success({
-    //                 msg: 'createUser',
-    //                 data: {
-    //                     userInfo: dataCreateUser
-    //                 }
-    //             })
-    //         }
-    //     } else {
-    //         // 微信注册失败
-    //         ctx.response.body = fail({
-    //             msg: 'createUser',
-    //             data: {
-    //                 userInfo: undefined
-    //             }
-    //         })
-    //     }
-    // }
 }
 
-// 设置wxSession
+// 设置wxSession && 自动注册
 const getWxSession = async(ctx, next) => {
-    const { wxSession, wxSessionCode } = ctx.query
-    let dataSession = ''
-    if(wxSession) {
-
-    } else {
-        // 没有session时，创建session
-        dataSession = await serviceOfficialUser.wxEnSession({
-            wxSessionCode
-        })
-    }
     ctx.response.type ='application/json'
+    const { 
+        wxSessionCode,
+        phone, 
+        nickName, 
+        gender, 
+        province, 
+        city, 
+        country, 
+        avatarUrl 
+    } = ctx.query
+
+    // 通过wxSessionCode 获取 openId 查询 userInfo
+    const dataWX = await getOpenIdAndSeesionKey(wxSessionCode)
+    // 获取userInfo
+    let dataOfficialUser = await serviceOfficialUser.getUserInfo({
+        wxOpenId: dataWX.openId
+    })
+
+    let dataSession = undefined
+    if(dataOfficialUser) {
+        // 用户已注册
+        dataSession = await serviceOfficialUser.wxEnSession({
+            userInfo: dataOfficialUser
+        })
+    } else {
+        // 用户未注册，进行注册
+        dataOfficialUser = await serviceOfficialUser.createNotWXSessionCode({
+            openId: dataWX.openId,
+            phone, 
+            nickName, 
+            gender, 
+            province, 
+            city, 
+            country, 
+            avatarUrl
+        })
+        if(dataOfficialUser) {
+            // 注册成功，获取wxSession
+            dataSession = await serviceOfficialUser.wxEnSession({
+                userInfo: dataOfficialUser
+            })
+        }
+    }
+
     if(dataSession) {
         ctx.response.body = success({
             msg: 'getWxSession',

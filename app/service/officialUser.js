@@ -2,35 +2,28 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 19:58:21
+ * @Last Modified time: 2017-10-22 02:17:45
  */
 const { getOpenIdAndSeesionKey } = require('./wx/util')
 const { success, fail } = require('../utils/returnUtil')
 const daoOfficialUser = require('../dao/officialUser')
 const mongo = require('mongodb')
 
-exports.create = async (options) => {    
+exports.create = async (options) => {
     const dataWX = await getOpenIdAndSeesionKey(options.wxSessionCode)
     let save = {
         wxOpenId: dataWX.openId,
-        phone, 
-        nickName, 
-        gender, 
-        province, 
-        city, 
-        country, 
-        avatarUrl,
-    } = options
-
-    save = {
-        ...save,
+        phone: options.phone, 
+        nickName: options.nickName, 
+        gender: options.gender, 
+        province: options.province, 
+        city: options.city, 
+        country: options.country, 
+        avatarUrl: options.avatarUrl,
         isShow: true,
         isActive: true,
         isDelete: false,
-        // 0 = 已申请已激活、1 = 未申请、2 = 已申请未通过、3 = 已申请未激活
-        officialActiveCode: 1
     }
-
     const dataOfficialUser = await daoOfficialUser.create(save)
     if(dataOfficialUser) {
         return success({
@@ -46,6 +39,30 @@ exports.create = async (options) => {
             userInfo: dataOfficialUser || {}
         }
     })
+}
+
+exports.createNotWXSessionCode = async (options) => {
+    let save = {
+        wxOpenId: options.openId,
+        phone: options.phone, 
+        nickName: options.nickName, 
+        gender: options.gender, 
+        province: options.province, 
+        city: options.city, 
+        country: options.country, 
+        avatarUrl: options.avatarUrl,
+        isShow: true,
+        isActive: true,
+        isDelete: false,
+    }
+    const dataOfficialUser = await daoOfficialUser.create(save)
+    if(dataOfficialUser) {
+        dataOfficialUser.userId = dataOfficialUser._id
+        delete dataOfficialUser._id
+        return dataOfficialUser
+    } else {
+        return undefined
+    }
 }
 
 exports.setUserInfo = async(query, update) => {
@@ -118,10 +135,15 @@ exports.getSessionUserInfo = async (options) => {
     const find = {}
     let dataValidUser = await daoOfficialUser.get(query, find)
     
+    // 未注册用户
     if(dataValidUser.length === 0) {
-        return undefined
+        return {
+            ...dataWX,
+            type: 'unregistered'
+        }
     }
-
+    
+    // 已注册用户
     dataValidUser = dataValidUser[0]
     dataValidUser = {
         ...dataValidUser,
@@ -135,19 +157,13 @@ exports.getSessionUserInfo = async (options) => {
 
 exports.wxEnSession = async(options) => {
     const crypto = require('../utils/crypto')
-    const dataGetSessionUserInfo = await this.getSessionUserInfo({
-        wxSessionCode: options.wxSessionCode
-    })
-
-    if(dataGetSessionUserInfo) {
-        const enSession = crypto.cipher(JSON.stringify({
-            userInfo: dataGetSessionUserInfo,
-            maxAge: 86400000 * 365,
-            create: Date.parse(new Date())
-        }))
-        return enSession
-    }
-    return undefined
+    let enSession = undefined
+    enSession = crypto.cipher(JSON.stringify({
+        userInfo: options.userInfo,
+        maxAge: 86400000 * 365,
+        create: Date.parse(new Date())
+    }))
+    return enSession
 }
 
 exports.wxDeSession = async(options) => {
