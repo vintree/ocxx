@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 21:54:37
+ * @Last Modified time: 2017-10-21 15:31:54
  */
 
 const mongo = require('mongodb')
@@ -22,41 +22,26 @@ const textCut = require('../utils/textCut')
 const time = require('../utils/time')
 
 exports.create = async(options) => {
-    const dataWX = await getOpenIdAndSeesionKey(options.wxSessionCode)
-    const dataOfficialUser = await daoOfficialUser.get({
-        wxOpenId: dataWX.openId
-    })
-    // 用户是否存在
-    if(dataOfficialUser) {
-        const save = {
-            officialId : dataOfficialUser[0].officialId,
-            officialInfoTitle : options.officialInfoTitle,
-            officialInfoContent : options.officialInfoContent,
-            officialInfoSupport : 0,
-            officialInfoShare : 0,
-            isShow : true,
-            isActive : true,
-            isDelete: false,
-            update : undefined
-        }
-        // 创建消息
-        const dataCreateOfficialInfo = await daoOfficialInfo.create(save)
-        if(dataCreateOfficialInfo) {
-            return success({
-                msg: 'createOfficialInfo',
-                data: {
-                    success: true,
-                    officialInfoId: dataCreateOfficialInfo[0]._id
-                }
-            })
+    const save = {
+        officialId : options.officialId,
+        officialInfoTitle : options.officialInfoTitle,
+        officialInfoContent : options.officialInfoContent,
+        officialInfoSupport : 0,
+        officialInfoShare : 0,
+        officialInfoWXQrcodePicUrl: undefined,
+        isShow : true,
+        isActive : true,
+        isDelete: false,
+        update : undefined
+    }
+    // 创建消息
+    const dataCreateOfficialInfo = await daoOfficialInfo.create(save)
+    if(dataCreateOfficialInfo) {
+        return {
+            officialInfoId: dataCreateOfficialInfo[0]._id
         }
     }
-    return fail({
-        msg: 'createOfficialInfo',
-        data: {
-            success: false,
-        }
-    })
+    return undefined
 }
 
 // 官方的信息
@@ -326,29 +311,30 @@ exports.setDelete = async(options) => {
 exports.setOfficialInfo = async(options) => {
     let dataOfficialInfo = undefined
     // 获取合法用户 && 获取 officialId
-    const dataUserInfo = await serviceOfficialUser.getUserInfo({
-        wxSessionCode: options.wxSessionCode
-    })
-    
-    if(dataUserInfo) {
-        const query = {
-            _id : options.officialInfoId.toString(),
-            officialId : dataUserInfo.officialId,
-            isActive: true
+    // const dataUserInfo = await serviceOfficialUser.getUserInfo({
+    //     wxSessionCode: options.wxSessionCode
+    // })
+    const query = {
+        _id : options.officialInfoId.toString(),
+        officialId : options.officialId,
+        isActive: true
+    }
+    const update = {
+        $set: {
+            // officialInfoTitle: options.officialInfoTitle,
+            // officialInfoContent: options.officialInfoContent,
+            ...options,
+            update: Date.parse(new Date())
         }
-        const update = {
-            $set: {
-                officialInfoTitle: options.officialInfoTitle,
-                officialInfoContent: options.officialInfoContent,
-                update: Date.parse(new Date())
-            }
-        }
-        dataOfficialInfo = await daoOfficialInfo.set(query, update, {})
+    }
+
+    dataOfficialInfo = await daoOfficialInfo.set(query, update, {})
+    if(dataOfficialInfo) {
         return {
             officialInfoId: dataOfficialInfo._id,
         }
     }
-    return undefined
+    return dataOfficialInfo
 }
 
 exports.addSupport = async(options) => {

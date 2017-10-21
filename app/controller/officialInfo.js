@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 02:21:32
+ * @Last Modified time: 2017-10-21 15:31:20
  */
 
 const log = require('../../config/log4js')
@@ -12,40 +12,101 @@ const serviceOfficialInfo = require('../service/officialInfo')
 const serviceOfficialUser = require('../service/officialUser')
 const serviceOfficial = require('../service/official')
 const serviceOfficialDynamic = require('../service/officialDynamic')
+const serviceQrcpde = require('../service/qrcode')
 const { getOpenIdAndSeesionKey } = require('../service/wx/util')
 
 const create = async (ctx, next) => {
-    const { wxSessionCode, officialInfoTitle, officialInfoContent } = ctx.query
-    const dataCreate = await serviceOfficialInfo.create({
-        wxSessionCode: wxSessionCode,
-        officialInfoTitle: officialInfoTitle,
-        officialInfoContent: officialInfoContent
+    const { 
+        wxSession, officialInfoTitle, officialInfoContent, 
+        wxScene, wxPage, wxWidth, wxAutoColor, wxLineColor 
+    } = ctx.query
+    
+    const dataUser = await serviceOfficialUser.wxDeSession({
+        wxSession
     })
+    let dataOfficialInfo = undefined
+    let dataCreate = undefined
+    
+    if(dataUser && dataUser.userInfo && dataUser.userInfo.officialId) {
+        const officialId = dataUser.userInfo.officialId
+
+        dataCreate = await serviceOfficialInfo.create({
+            officialId: officialId,
+            officialInfoTitle: officialInfoTitle,
+            officialInfoContent: officialInfoContent,
+        })
+        
+        if(officialId) {
+            const officialInfoWXQrcodePicUrl = await serviceQrcpde.getWxUnlimit({
+                wxScene: `${dataCreate.officialInfoId}`,
+                wxPage,
+                wxWidth,
+                wxAutoColor,
+                wxLineColor
+            })
+        
+            dataOfficialInfo = await serviceOfficialInfo.setOfficialInfo({
+                officialId: dataUser.userInfo.officialId,
+                officialInfoId: dataCreate.officialInfoId,
+                officialInfoWXQrcodePicUrl: officialInfoWXQrcodePicUrl
+            })
+        }
+    }
 
     ctx.response.type ='application/json'
-
-    if(dataCreate.code === 200) {
-        ctx.response.body = {
-            success: true,
-            ...dataCreate
-        }
+    if(dataOfficialInfo) {
+        ctx.response.body = success({
+            msg: 'createOfficialInfo',
+            data: {
+                success: true,
+                ...dataCreate
+            }
+        })
+    } else {
+        ctx.response.body = fail({
+            msg: 'createOfficialInfo',
+            data: {
+                success: false
+            }
+        })
     }
 }
 
 const setOfficialInfo = async (ctx, next) => {
-    const { wxSessionCode, officialInfoId, officialInfoTitle, officialInfoContent } = ctx.query
-    const dataOfficialInfo = await serviceOfficialInfo.setOfficialInfo({
-        wxSessionCode: wxSessionCode,
-        officialInfoId: officialInfoId,
-        officialInfoTitle: officialInfoTitle,
-        officialInfoContent: officialInfoContent
+    const { wxSession, officialInfoId, officialInfoTitle, officialInfoContent } = ctx.query
+
+    const dataUser = serviceOfficialUser.wxEnSession({
+        wxSession
     })
+
     ctx.response.type ='application/json'
-    if(dataOfficialInfo) {
-        ctx.response.body = success({
+    if(dataUser.userInfo) {
+        const dataOfficialInfo = await serviceOfficialInfo.setOfficialInfo({
+            officialId: dataUser.userInfo.officialId,
+            officialInfoId: officialInfoId,
+            officialInfoTitle: officialInfoTitle,
+            officialInfoContent: officialInfoContent
+        })
+        if(dataOfficialInfo) {
+            ctx.response.body = success({
+                msg: 'setOfficialInfo',
+                data: {
+                    officialInfoId: dataOfficialInfo.officialInfoId
+                }
+            })
+        } else {
+            ctx.response.body = fail({
+                msg: 'setOfficialInfo',
+                data: {
+                    officialInfoId: ''
+                }
+            })    
+        }
+    } else {
+        ctx.response.body = fail({
             msg: 'setOfficialInfo',
             data: {
-                officialInfoId: dataOfficialInfo.officialInfoId
+                officialInfoId: ''
             }
         })
     }

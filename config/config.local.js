@@ -11,3 +11,5 @@ exports.mongodb = 'mongodb://px:wh6282804@106.14.146.127:27017/ico'
 exports.logPath = path.join(__dirname, '../logs')
 
 exports.officialPicPath = '/usr/local/src/pic/official/official/'
+
+exports.officialQrcodePicPath = '/usr/local/src/pic/official/qrcode/'
