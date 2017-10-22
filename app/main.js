@@ -1,6 +1,9 @@
-const serviceOfficial = require('./service/official')
+const schedule = require('../app/service/schedule/official')
 
-exports.setMapOfficialList = async() => {
+
+// const serviceOfficial = require('./service/official')
+
+// exports.setMapOfficialList = async() => {
     // const dataMapOfficialList = await serviceOfficial.getMapOfficialList()
     // const mapOfficial = {}
     // for(let i = 0, l = dataMapOfficialList.length; i < l; i++) {
@@ -10,12 +13,16 @@ exports.setMapOfficialList = async() => {
 
     // console.log('已添加数据之内存 global.mapOfficial = ', mapOfficial);
     // global.mapOfficial = mapOfficial
-}
+// }
 
-exports.updateMapOfficialList = (options) => {
-    const mapOfficial = global.mapOfficial
-    global.mapOfficial = {
-        ...mapOfficial,
-        options
-    }
+// exports.updateMapOfficialList = (options) => {
+//     const mapOfficial = global.mapOfficial
+//     global.mapOfficial = {
+//         ...mapOfficial,
+//         options
+//     }
+// }
+
+exports.init = async() => {
+    schedule.init()
 }

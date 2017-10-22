@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:02:49 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-08 11:44:11
+ * @Last Modified time: 2017-10-23 00:10:11
  */
 const startTime = new Date()
 
@@ -16,7 +16,7 @@ const koaBody = require('koa-body')
 const fs = require('fs')
 const logger = require('koa-logger')
 const log = require('./config/log4js')
-const schedule = require('./app/service/schedule/schedule')
+// const schedule = require('./app/service/schedule/schedule')
 let config = {}
 
 if( process.env.NODE_ENV === 'production' ) { 

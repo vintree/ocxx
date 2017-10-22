@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-15 20:30:02
+ * @Last Modified time: 2017-10-22 21:48:24
  */
 
 const {
@@ -30,7 +30,7 @@ exports.getCircleListAndOfficialCount = async() => {
                 circleId: circleData._id,
                 circleName: circleData.circleName || '未定义',
                 circleNameEN: circleData.circleNameEN || 'Undefined',
-                circlePic: circleData.circlePic || 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1507578056394&di=078ff49234a09f8e2f6923e28e90e7df&imgtype=0&src=http%3A%2F%2Fimage.bitautoimg.com%2Ftaoche%2F2016_pc_usedcar%2Ffail_150_150.png'
+                circlePicUrl: circleData.circlePicUrl || 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1507578056394&di=078ff49234a09f8e2f6923e28e90e7df&imgtype=0&src=http%3A%2F%2Fimage.bitautoimg.com%2Ftaoche%2F2016_pc_usedcar%2Ffail_150_150.png'
             })
         }
         return _circleList

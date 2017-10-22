@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 17:08:54
+ * @Last Modified time: 2017-10-22 23:41:38
  */
 
 const log = require('../../config/log4js')
@@ -265,17 +265,36 @@ const getOfficialInfoList = async (ctx, next) => {
 }
 
 const del = async (ctx, next) => {
-    const { wxSessionCode, officialInfoId } = ctx.query
-    const dataOfficialInfo = await serviceOfficialInfo.setDelete({
-        wxSessionCode: wxSessionCode,
-        officialInfoId: officialInfoId
-    })
     ctx.response.type ='application/json'
+    const { wxSession, officialInfoId } = ctx.query
+    const dataSession = await serviceOfficialUser.wxDeSession({
+        wxSession
+    })
+    // 查询用户的officialId
+    const dataUser = await serviceOfficialUser.getUserDetail({
+        userId: dataSession.userInfo.userId
+    })
+    
+    let dataOfficialInfo = undefined
+    if(dataUser.officialId) {
+        dataOfficialInfo = await serviceOfficialInfo.setDelete({
+            officialId: dataUser.officialId,
+            officialInfoId: officialInfoId
+        })
+    }
+    
     if(dataOfficialInfo) {
         ctx.response.body = success({
-            msg: 'setOfficialInfo',
+            msg: 'officialInfoDelete',
             data: {
                 success: true
+            }
+        })
+    } else {
+        ctx.response.body = success({
+            msg: 'officialInfoDelete',
+            data: {
+                success: false
             }
         })
     }

@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 16:46:05
+ * @Last Modified time: 2017-10-23 00:32:26
  */
 
 const asyncHooks = require('async_hooks')
@@ -49,12 +49,19 @@ const focus = async (ctx, next) => {
 }
 
 const share = async (ctx, next) => {
-    const { wxSessionCode, officialId } = ctx.query
-    
-    const dataUser = await serviceOfficialUser.getUserInfo(wxSessionCode)
+    ctx.response.type ='application/json'
+    const { wxSession, officialId } = ctx.query
+    const dataSession = await serviceOfficialUser.wxDeSession({
+        wxSession
+    })
+
+
+    const dataUser = await serviceOfficialUser.getUserDetail({
+        userId: dataSession.userInfo.userId
+    })
     const options = {}
 
-    if(dataUser.isValid) {
+    if(dataUser) {
         options = {
             userId: dataUser.userId,
             officialId : officialId
@@ -62,16 +69,25 @@ const share = async (ctx, next) => {
     }
 
     const dataOfficialDynamic = await serviceOfficialDynamic.createOfficialShare(options)
-    if(dataOfficialDynamic.code === 200) {
-        ctx.response.type ='application/json'
-        ctx.response.body = Object.assign(dataOfficialDynamic, {
-            success: true
+    if(dataOfficialDynamic) {
+        ctx.response.body = success({
+            msg: 'officialShare',
+            data: {
+                success: true
+            }
+        })
+    } else {
+        ctx.response.body = fail({
+            msg: 'officialShare',
+            data: {
+                success: false
+            }
         })
     }
 }
 
 const infoShare = async (ctx, next) => {
-    const { wxSession, officialInfoId } = ctx.query
+    const { wxSession, officialId, officialInfoId } = ctx.query
     const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
@@ -80,7 +96,8 @@ const infoShare = async (ctx, next) => {
     if(dataSession) {
         options = {
             userId: dataSession.userInfo.userId,
-            officialInfoId : officialInfoId
+            officialInfoId : officialInfoId,
+            officialId: officialId
         }
         // 添加动态
         const dataOfficialDynamic = await serviceOfficialDynamic.createOfficialInfoShare(options)
@@ -118,14 +135,15 @@ const infoShare = async (ctx, next) => {
 }
 
 const infoSupport = async (ctx, next) => {
-    const { wxSession, officialInfoId } = ctx.query
+    const { wxSession, officialId, officialInfoId } = ctx.query
     const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
     if(dataSession) {
         let options = {
             userId: dataSession.userInfo.userId,
-            officialInfoId : officialInfoId
+            officialInfoId : officialInfoId,
+            officialId: officialId
         }
         // 添加动态
         const dataOfficialDynamic = await serviceOfficialDynamic.createOfficialInfoSupport(options)
@@ -195,4 +213,4 @@ module.exports = {
     'GET /rest/official/dynamic/share': share,
     'GET /rest/official/dynamic/infoShare': infoShare,
     'GET /rest/official/dynamic/infoSupport': infoSupport,
-};
+}

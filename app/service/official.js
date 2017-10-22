@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 13:22:29
+ * @Last Modified time: 2017-10-23 00:56:16
  */
 const {
     success,
@@ -76,6 +76,17 @@ exports.getOfficialDetail = async(options) => {
     return undefined
 }
 
+// 获取原生官方信息
+exports.getPureOfficialList = async() => {
+    // 获取官方信息
+    const dataOfficialList = await daoOfficial.get({
+        isShow: true,
+        isActive: true,
+        isDelete: false
+    }, {}, {})
+    return dataOfficialList
+}
+
 exports.getOfficialList = async(options) => {
     const { userId, circleId, page, pageSize } = options
     try {
@@ -122,7 +133,7 @@ exports.getOfficialList = async(options) => {
     return undefined
 }
 
-exports.getMapOfficialList = async(qeury, find) => {
+exports.getMapOfficialList = async(query, find) => {
     try {
         let dataOfficialList = await daoOfficial.get({
             isShow: true,
@@ -194,11 +205,19 @@ exports.getOfficialInfoList = async(options) => {
 }
 
 exports.setOfficialInfo = async(options) => {
-    let dataOfficialInfo = await daoOfficial.set({
-        _id: options.officialId,
-    }, {
+    const query = {
+        _id: options.officialId
+    }
+
+    delete options.officialId
+
+    const find = {
+        ...options
+    }
+    
+    let dataOfficialInfo = await daoOfficial.set(query, {
         $set: {
-            ...options,
+            ...find,
             update: Date.parse(new Date())
         }
     })

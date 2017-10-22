@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 14:15:06
+ * @Last Modified time: 2017-10-22 23:54:46
  */
 
 const mongo = require('mongodb')
@@ -329,16 +329,12 @@ exports.getOfficialInfoList = async(options) => {
 }
 
 exports.setDelete = async(options) => {
-    let dataOfficialInfo = undefined
-    // 获取合法用户 && 获取 officialId
-    const dataUserInfo = await serviceOfficialUser.getUserInfo({
-        wxSessionCode: options.wxSessionCode
-    })
-    
-    if(dataUserInfo) {
+    const { officialId, officialInfoId } = options
+    let dataOfficialInfo = undefined    
+    if(officialId) {
         const query = {
-            _id : options.officialInfoId.toString(),
-            officialId : dataUserInfo.officialId,
+            _id : officialInfoId.toString(),
+            officialId : officialId
         }
         const update = {
             $set: {

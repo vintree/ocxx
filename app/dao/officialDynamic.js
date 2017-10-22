@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:06:07 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 18:51:17
+ * @Last Modified time: 2017-10-23 00:48:10
  */
 
 const mongo = require('mongodb');
@@ -49,8 +49,7 @@ exports.get = async (options = {}, projection = {}, sort = {}) => {
     delete projection.page
     delete projection.pageSize
     try {
-        officialDynamic = await db.collection('officialDynamic').find(options, projection).skip((page - 1) * pageSize).limit(pageSize).sort(sort).toArray();
-        // pageTotal = await db.collection('officialDynamic').find({hasDelete: false}).count();
+        officialDynamic = await db.collection('officialDynamic').find(options, projection).skip((page - 1) * pageSize).limit(pageSize).sort(sort).toArray()
     } catch(e) {
         log.db.error(`tableName: officialDynamic; function: get; info: ${e}`)
         console.error(e);

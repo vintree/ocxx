@@ -48,8 +48,8 @@ module.exports = function (dir) {
     var controllersDir = dir || 'controller';
     addControllers(router, controllersDir);
 
-    // 官方数据放置内存
-    // main.setMapOfficialList()
+    // 主要信息
+    main.init()
 
     return router.routes();
 };

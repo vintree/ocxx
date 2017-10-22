@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 02:17:45
+ * @Last Modified time: 2017-10-22 23:56:51
  */
 const { getOpenIdAndSeesionKey } = require('./wx/util')
 const { success, fail } = require('../utils/returnUtil')
@@ -82,9 +82,9 @@ exports.setUserInfo = async(query, update) => {
 
 // 切勿再次使用，查询用户是否存在
 exports.getUserInfo = async (options) => {
-    const dataWX = await getOpenIdAndSeesionKey(options.wxSessionCode)
+    // const dataWX = await getOpenIdAndSeesionKey(options.wxSessionCode)
     const query = {
-        wxOpenId: dataWX.openId,
+        wxOpenId: options.openId,
         isShow: true,
         isActive: true
     }
@@ -134,7 +134,6 @@ exports.getSessionUserInfo = async (options) => {
     }
     const find = {}
     let dataValidUser = await daoOfficialUser.get(query, find)
-    
     // 未注册用户
     if(dataValidUser.length === 0) {
         return {

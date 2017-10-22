@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 16:46:50
+ * @Last Modified time: 2017-10-22 23:57:13
  */
 
 const log = require('../../config/log4js')
@@ -102,14 +102,12 @@ const getWxSession = async(ctx, next) => {
         country, 
         avatarUrl 
     } = ctx.query
-
     // 通过wxSessionCode 获取 openId 查询 userInfo
     const dataWX = await getOpenIdAndSeesionKey(wxSessionCode)
     // 获取userInfo
     let dataOfficialUser = await serviceOfficialUser.getUserInfo({
-        wxOpenId: dataWX.openId
+        openId: dataWX.openId
     })
-
     let dataSession = undefined
     if(dataOfficialUser) {
         // 用户已注册

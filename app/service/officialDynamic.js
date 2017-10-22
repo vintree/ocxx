@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 14:12:23
+ * @Last Modified time: 2017-10-23 01:05:35
  */
 
 const mongo = require('mongodb')
@@ -21,8 +21,8 @@ const time = require('../utils/time')
 
 exports.createOfficialFocus = async(options) => {
     const data = {
-        userId: options.userId,
-        officialId : options.officialId,
+        userId: options.userId + '',
+        officialId : options.officialId + '',
         officialInfoId: undefined,
         typeCode: 1003,
         isShow: true,
@@ -34,8 +34,8 @@ exports.createOfficialFocus = async(options) => {
 
 exports.createOfficialShare = async(options) => {
     const data = {
-        userId: options.userId,
-        officialId : options.officialId,
+        userId: options.userId + '',
+        officialId : options.officialId + '',
         officialInfoId: undefined,
         typeCode: 1001,
         isShow: true,
@@ -47,9 +47,9 @@ exports.createOfficialShare = async(options) => {
 
 exports.createOfficialInfoShare = async(options) => {
     const data = {
-        userId: options.userId,
-        officialId : undefined,
-        officialInfoId: options.officialInfoId,        
+        userId: options.userId + '',
+        officialId : options.officialId + '',
+        officialInfoId: options.officialInfoId + '',        
         typeCode: 2001,
         isShow: true,
         isActive: true,
@@ -60,9 +60,9 @@ exports.createOfficialInfoShare = async(options) => {
 
 exports.createOfficialInfoSupport = async(options) => {
     const data = {
-        userId: options.userId,
-        officialId : undefined,
-        officialInfoId: options.officialInfoId,
+        userId: options.userId + '',
+        officialId : options.officialId + '',
+        officialInfoId: options.officialInfoId + '',
         typeCode: 2002,
         isShow: true,
         isActive: true,
@@ -76,7 +76,7 @@ exports.createOfficialInfoSupport = async(options) => {
 
 exports.getDynamicList = async(options) => {
     const data = {
-        userId : options.userId,
+        userId : options.userId + '',
         isShow: true,
         isActive: true,
         isDelete: false
@@ -87,7 +87,7 @@ exports.getDynamicList = async(options) => {
 // 获取用户关注信息
 exports.getDynamicOfficialFocusList = async(options) => {
     const query = {
-        userId : options.userId,
+        userId : options.userId + '',
         typeCode: 1003,
         isShow: true,
         isActive: true,
@@ -101,90 +101,106 @@ exports.getDynamicOfficialFocusList = async(options) => {
 
 exports.getOfficialFocusCount = async(options) => {
     const data = {
-        officialId : options.officialId,
+        officialId : options.officialId + '',
         typeCode: 1003,
         isShow: true,
-        isActive: true
+        isActive: true,
+        isDelete: false
     }
-    return await daoOfficialDynamic.get(data)
+    const dataOfficialFocusCount = await daoOfficialDynamic.get(data) || []
+    return dataOfficialFocusCount.length
 }
 
 exports.getUserFocusCount = async(options) => {
     const data = {
-        userId : options.userId,
+        userId : options.userId + '',
         typeCode: 1003,
         isShow: true,
-        isActive: true
+        isActive: true,
+        isDelete: false
     }
-    return await daoOfficialDynamic.get(data)
+    const dataOfficialDynamic = await daoOfficialDynamic.get(data) || []
+    return dataOfficialDynamic.length
 }
 
 exports.getOfficialShareCount = async(options) => {
     const data = {
-        officialId : options.officialId,
-        typeCode: 1001,
+        officialId : options.officialId + '',
+        typeCode: 2001,
         isShow: true,
-        isActive: true
+        isActive: true,
+        isDelete: false
     }
-    return await daoOfficialDynamic.get(data)
+    const dataOfficialDynamic = await daoOfficialDynamic.get(data) || []
+    return dataOfficialDynamic.length
 }
 
-exports.getUserShareCount = async(options) => {
+exports.getOfficialSupportCount = async(options) => {
     const data = {
-        userId: options.userId,
-        typeCode: 1001,
+        officialId: options.officialId + '',
+        typeCode: 2002,
         isShow: true,
-        isActive: true
+        isActive: true,
+        isDelete: false
     }
-    return await daoOfficialDynamic.get(data)
+    const dataOfficialDynamic = await daoOfficialDynamic.get(data)
+    return dataOfficialDynamic.length
 }
 
 exports.getOfficialInfoShareCount = async(options) => {
     const data = {
-        officialInfo : options.officialInfo,
+        officialInfo : options.officialInfo + '',
         typeCode: 2001,
         isShow: true,
-        isActive: true
+        isActive: true,
+        isDelete: false
     }
-    return await daoOfficialDynamic.get(data)
+    const dataOfficialDynamic = await daoOfficialDynamic.get(data) || []
+    return dataOfficialDynamic.length
 }
 
 exports.getUserInfoShareCount = async(options) => {
     const data = {
-        userId: options.userId,
+        userId: options.userId + '',
         typeCode: 2001,
         isShow: true,
-        isActive: true
+        isActive: true,
+        isDelete: false
     }
-    return await daoOfficialDynamic.get(data)
+    const dataOfficialDynamic = await daoOfficialDynamic.get(data) || []
+    return dataOfficialDynamic.length
 }
 
 exports.getOfficialInfoSupportCount = async(options) => {
     const data = {
-        officialInfoId : options.officialInfo,
+        officialInfoId : options.officialInfo + '',
         typeCode: 2002,
         isShow: true,
-        isActive: true
+        isActive: true,
+        isDelete: false
     }
-    return await daoOfficialDynamic.get(data)
+    const dataOfficialDynamic = await daoOfficialDynamic.get(data) || []
+    return dataOfficialDynamic.length
 }
 
 exports.getUserInfoSupportCount = async(options) => {
     const data = {
-        userId: options.userId,
+        userId: options.userId + '',
         typeCode: 2002,
         isShow: true,
-        isActive: true
+        isActive: true,
+        isDelete: false
     }
-    return await daoOfficialDynamic.get(data)
+    const dataOfficialDynamic = await daoOfficialDynamic.get(data) || []
+    return dataOfficialDynamic.length
 }
 
 // get --------------------------------------
 
 exports.getUserInfoSupport = async(options) => {
     const query = {
-        userId: options.userId,
-        officialInfoId: options.officialInfoId,
+        userId: options.userId + '',
+        officialInfoId: options.officialInfoId + '',
         typeCode: 2002,
         isShow: true,
         isActive: true,

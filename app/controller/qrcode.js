@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 03:20:32
+ * @Last Modified time: 2017-10-22 23:57:12
  */
 
 // const serviceOfficial = require('../service/official')
@@ -24,7 +24,6 @@ const getWxUnlimit = async (ctx, next) => {
     ctx.response.type = 'image/jpeg'
     ctx.response.body = dataQrcode
     // ctx.response.writeHead ='application/json'
-    console.log('dataQrcode', dataQrcode);
 }
 
 module.exports = {

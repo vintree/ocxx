@@ -17,7 +17,6 @@ async function getCommon(url, params = {}) {
 }
 
 async function postCommon(url = '', params = {}) {
-    console.log('url', url);
     try {
         const res = await fetch(url, {
             method: 'POST', 
