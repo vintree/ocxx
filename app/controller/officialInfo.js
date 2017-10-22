@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 14:20:44
+ * @Last Modified time: 2017-10-22 16:37:13
  */
 
 const log = require('../../config/log4js')
@@ -78,16 +78,17 @@ const create = async (ctx, next) => {
 }
 
 const setOfficialInfo = async (ctx, next) => {
+    ctx.response.type ='application/json'
     const { wxSession, officialInfoId, officialInfoTitle, officialInfoContent } = ctx.query
-
-    const dataUser = serviceOfficialUser.wxEnSession({
+    const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
-
-    ctx.response.type ='application/json'
-    if(dataUser.userInfo) {
+    if(dataSession.userInfo) {
+        const dataUser = await serviceOfficialUser.getUserDetail({
+            userId: dataSession.userInfo.userId
+        })
         const dataOfficialInfo = await serviceOfficialInfo.setOfficialInfo({
-            officialId: dataUser.userInfo.officialId,
+            officialId: dataUser.officialId,
             officialInfoId: officialInfoId,
             officialInfoTitle: officialInfoTitle,
             officialInfoContent: officialInfoContent
@@ -146,8 +147,9 @@ const get = async (ctx, next) => {
         officialId: dataOfficialInfo.officialId
     })
 
-    // 获取用户信息
+    // 获取用户操作信息
     let dataOfficialDynamic = undefined
+    let isOneself = false
     if(wxSession) {
         const dataSession = await serviceOfficialUser.wxDeSession({
             wxSession
@@ -158,6 +160,12 @@ const get = async (ctx, next) => {
                 officialInfoId
             })
         }
+
+        const dataOfficialUser = await serviceOfficialUser.getUserDetail({
+            userId: dataSession.userInfo.userId
+        })
+        isOneself = dataOfficialUser.officialId === dataOfficialInfo.officialId
+        console.log('isOneself', isOneself);
     }
 
     if(dataOfficialInfo && dataOfficial) {
@@ -167,7 +175,8 @@ const get = async (ctx, next) => {
             data: {
                 officialInfo: dataOfficialInfo,
                 official: dataOfficial,
-                isOfficialInfoSupport: !!dataOfficialDynamic
+                isOfficialInfoSupport: !!dataOfficialDynamic,
+                isOneself: isOneself
             }
         })
     }
