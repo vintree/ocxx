@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 02:49:08
+ * @Last Modified time: 2017-10-22 13:18:03
  */
 
 const _ = require('../utils/request')
@@ -39,10 +39,7 @@ const create = async (ctx, next) => {
 
     let officialId = undefined
     if(dataUser) {
-        console.log('1');
-        console.log('object', dataUser.officialId);
         if(!dataUser.officialId) {
-            console.log('2', dataUser);
             // 创建机构
             const dataCreate = await serviceOfficial.create({
                 circleId,
@@ -59,17 +56,12 @@ const create = async (ctx, next) => {
             })
             // 机构挂在到用户
             if(dataCreate) {
-                console.log('3', dataCreate);
                 const dataUserInfo = await serviceOfficialUser.setUserInfo({
                     userId: dataUser.userId
                 }, {
                     officialId: dataCreate.officialId.toString()
                 })
-
-                console.log('dataUserInfo==', dataUserInfo);
-
                 if(dataUserInfo) {
-                    console.log('4', dataUserInfo);
                     ctx.response.body = success({
                         msg: 'createOfficial',
                         data: {
@@ -80,13 +72,6 @@ const create = async (ctx, next) => {
             }
         }
     }
-    console.log('end');
-    // ctx.response.body = fail({
-    //     msg: 'createOfficialInfo',
-    //     data: {
-    //         success: false
-    //     }
-    // })
 }
 
 const getList = async (ctx, next) => {

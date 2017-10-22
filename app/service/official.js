@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 21:48:13
+ * @Last Modified time: 2017-10-22 13:22:29
  */
 const {
     success,
@@ -58,7 +58,6 @@ exports.getOfficialDetail = async(options) => {
         isShow: 0,
         isDelete: 0
     })
-
     if(dataOfficial) {
         dataOfficial = dataOfficial[0]
         dataOfficial.isOfficialFocus = false

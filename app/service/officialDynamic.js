@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 23:34:00
+ * @Last Modified time: 2017-10-22 14:12:23
  */
 
 const mongo = require('mongodb')
@@ -82,6 +82,21 @@ exports.getDynamicList = async(options) => {
         isDelete: false
     }
     return await daoOfficialDynamic.get(data)
+}
+
+// 获取用户关注信息
+exports.getDynamicOfficialFocusList = async(options) => {
+    const query = {
+        userId : options.userId,
+        typeCode: 1003,
+        isShow: true,
+        isActive: true,
+        isDelete: false
+    }
+    const find = {
+        officialId: 1
+    }
+    return await daoOfficialDynamic.get(query, find)
 }
 
 exports.getOfficialFocusCount = async(options) => {

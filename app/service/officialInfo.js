@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 15:31:54
+ * @Last Modified time: 2017-10-22 14:15:06
  */
 
 const mongo = require('mongodb')
@@ -238,6 +238,52 @@ exports.getOfficialAndOfficialInfoList = async(options) => {
     })
 }
 
+// 用户关注官方信息
+exports.getUserFocusOfficialInfoList = async(options) => {
+    const query = {
+        officialId: {
+            $in: options.officialIds
+        },
+        isShow: true,
+        isActive: true,
+        isDelete: false
+    }
+    let officialInfoList = await daoOfficialInfo.get(query, {
+        pageSize: options.pageSize,
+        page: options.page,
+    }, {
+        create: -1
+    })
+
+    let _officialInfoList = undefined
+    if(officialInfoList) {
+        _officialInfoList = loops.getAsyncNewArray(officialInfoList, async(item) => {
+            item.officialInfoId = item._id
+            item.officialInfoCutContent = item.officialInfoContent.length > 35 ? `${item.officialInfoContent.slice(0, 36)}...` : item.officialInfoContent
+            item.officialInfoCutContent = textCut.cut({
+                key: '2',
+                text: item.officialInfoContent
+            })
+            item.createRelative = time.relative(item.create)
+            item.createFull = time.full(item.create)
+            
+            // 额外添加官方名称
+            const dataOfficialDetail = await serviceOfficial.getOfficialDetail({
+                officialId: item.officialId
+            })
+            item.officialName = dataOfficialDetail.officialName
+            item.officialPicUrl = dataOfficialDetail.officialPicUrl
+
+            delete item._id
+            delete item.officialInfoContent
+            return item
+        })
+        return _officialInfoList
+    }
+    return undefined
+}
+
+// 官方信息
 exports.getOfficialInfoList = async(options) => {
     const query = {
         isShow: true,
@@ -273,9 +319,6 @@ exports.getOfficialInfoList = async(options) => {
             item.officialName = dataOfficialDetail.officialName
             item.officialPicUrl = dataOfficialDetail.officialPicUrl
 
-            // item.officialName = global.mapOfficial[item.officialId].officialName
-            // item.officialPicUrl = global.mapOfficial[item.officialId].officialPicUrl
-
             delete item._id
             delete item.officialInfoContent
             return item
@@ -310,19 +353,13 @@ exports.setDelete = async(options) => {
 
 exports.setOfficialInfo = async(options) => {
     let dataOfficialInfo = undefined
-    // 获取合法用户 && 获取 officialId
-    // const dataUserInfo = await serviceOfficialUser.getUserInfo({
-    //     wxSessionCode: options.wxSessionCode
-    // })
     const query = {
         _id : options.officialInfoId.toString(),
-        officialId : options.officialId,
-        isActive: true
     }
+    delete options.officialInfoId
+
     const update = {
         $set: {
-            // officialInfoTitle: options.officialInfoTitle,
-            // officialInfoContent: options.officialInfoContent,
             ...options,
             update: Date.parse(new Date())
         }

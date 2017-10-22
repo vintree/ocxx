@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 15:31:20
+ * @Last Modified time: 2017-10-22 14:20:44
  */
 
 const log = require('../../config/log4js')
@@ -14,6 +14,7 @@ const serviceOfficial = require('../service/official')
 const serviceOfficialDynamic = require('../service/officialDynamic')
 const serviceQrcpde = require('../service/qrcode')
 const { getOpenIdAndSeesionKey } = require('../service/wx/util')
+const { getAsyncNewArray } = require('../utils/loops')
 
 const create = async (ctx, next) => {
     const { 
@@ -21,14 +22,17 @@ const create = async (ctx, next) => {
         wxScene, wxPage, wxWidth, wxAutoColor, wxLineColor 
     } = ctx.query
     
-    const dataUser = await serviceOfficialUser.wxDeSession({
+    const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
     let dataOfficialInfo = undefined
     let dataCreate = undefined
     
-    if(dataUser && dataUser.userInfo && dataUser.userInfo.officialId) {
-        const officialId = dataUser.userInfo.officialId
+    const dataOfficialUser = await serviceOfficialUser.getUserDetail({
+        userId: dataSession.userInfo.userId
+    })
+    if(dataOfficialUser) {
+        const officialId = dataOfficialUser.officialId
 
         dataCreate = await serviceOfficialInfo.create({
             officialId: officialId,
@@ -37,6 +41,7 @@ const create = async (ctx, next) => {
         })
         
         if(officialId) {
+            // 获取小程序二维码
             const officialInfoWXQrcodePicUrl = await serviceQrcpde.getWxUnlimit({
                 wxScene: `${dataCreate.officialInfoId}`,
                 wxPage,
@@ -46,7 +51,7 @@ const create = async (ctx, next) => {
             })
         
             dataOfficialInfo = await serviceOfficialInfo.setOfficialInfo({
-                officialId: dataUser.userInfo.officialId,
+                officialId: officialId,
                 officialInfoId: dataCreate.officialInfoId,
                 officialInfoWXQrcodePicUrl: officialInfoWXQrcodePicUrl
             })
@@ -181,6 +186,48 @@ const getOfficialAndOfficialInfoList = async (ctx, next) => {
     }
 }
 
+const getUserFocusOfficialInfoList = async(ctx, next) => {
+    ctx.response.type ='application/json'
+    const { wxSession, page, pageSize } = ctx.query
+    const dataSession = await serviceOfficialUser.wxDeSession({
+        wxSession
+    })
+
+    // 存在
+    if(dataSession && dataSession.userInfo) {
+        const dataOfficialList = await serviceOfficialDynamic.getDynamicOfficialFocusList({
+            userId: dataSession.userInfo.userId
+        })
+
+        const dataOfficialIds = await getAsyncNewArray(dataOfficialList, (item) => {
+            return item.officialId
+        })
+
+        const dataUserFocusOfficialInfoList = await serviceOfficialInfo.getUserFocusOfficialInfoList({
+            officialIds: dataOfficialIds,
+            page,
+            pageSize
+        })
+
+        if(dataUserFocusOfficialInfoList) {
+            ctx.response.body = success({
+                msg: 'getUserFocusOfficialInfoList',
+                data: {
+                    success: true,
+                    officialInfoList: dataUserFocusOfficialInfoList
+                }
+            })
+        } else {
+            ctx.response.body = fail({
+                msg: 'getUserFocusOfficialInfoList',
+                data: {
+                    success: false
+                }
+            })
+        }
+    }
+}
+
 const getOfficialInfoList = async (ctx, next) => {
     const { officialId, page, pageSize } = ctx.query
     const dataOfficialInfoList = await serviceOfficialInfo.getOfficialInfoList({
@@ -188,6 +235,7 @@ const getOfficialInfoList = async (ctx, next) => {
         page,
         pageSize
     })
+
     ctx.response.type ='application/json'
     if(dataOfficialInfoList) {
         ctx.response.body = success({
@@ -229,6 +277,7 @@ module.exports = {
     'GET /rest/official/info/create': create,
     'GET /rest/official/info/setOfficialInfo': setOfficialInfo,
     'GET /rest/official/info/getOfficialAndOfficialInfoList': getOfficialAndOfficialInfoList,
+    'GET /rest/official/info/getUserFocusOfficialInfoList': getUserFocusOfficialInfoList,
     'GET /rest/official/info/getOfficialInfoList': getOfficialInfoList,
     'GET /rest/official/info/getTimeList': getTimeList,
     'GET /rest/official/info/get': get,

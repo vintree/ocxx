@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:06:07 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 15:09:07
+ * @Last Modified time: 2017-10-22 13:22:43
  */
 
 const mongo = require('mongodb');
@@ -88,7 +88,6 @@ exports.set = async (query = {}, update = {}, config = {}) => {
         }
         // collection.findAndModify(query, sort, update, options, callback)
 
-        console.log('updat====', query, update);
         dataUpdate = await db.collection('officialInfo').findAndModify(
             query,
             [['_id', 'asc']],
@@ -102,7 +101,6 @@ exports.set = async (query = {}, update = {}, config = {}) => {
         log.db.error(`tableName: officialInfo; function: get; info: ${e}`)
         console.error(e)
     }
-    console.log('dataUpdate', dataUpdate);
     // n: 1, nModified: 0, ok: 1
     // n 表示找到条数  nModified 表示修改条数 ok 表示操作状态
     db.close()

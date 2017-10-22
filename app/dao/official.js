@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:06:07 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-21 19:50:03
+ * @Last Modified time: 2017-10-22 12:55:33
  */
 
 const mongo = require('mongodb')
@@ -49,17 +49,17 @@ exports.get = async (options = {}, projection = {}, sort = {}) => {
     delete projection.pageSize
     try {
         official = await db.collection('official').find(options, projection).skip((page - 1) * pageSize).limit(pageSize).sort(sort).toArray();
-        pageTotal = await db.collection('official').find({hasDelete: false}).count();
+        // pageTotal = await db.collection('official').find({hasDelete: false}).count();
     } catch(e) {
         log.db.error(`tableName: official; function: get; info: ${e}`)
         console.error(e);
     }
     db.close()
-    let pagination = {
-        page: page,
-        pageSize: pageSize,
-        pageTotal: pageTotal
-    }
+    // let pagination = {
+    //     page: page,
+    //     pageSize: pageSize,
+    //     pageTotal: pageTotal
+    // }
     return official
 }
 
