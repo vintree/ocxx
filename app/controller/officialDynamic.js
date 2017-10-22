@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-19 23:56:03
+ * @Last Modified time: 2017-10-22 16:46:05
  */
 
 const asyncHooks = require('async_hooks')
@@ -16,14 +16,14 @@ const { success, fail } = require('../utils/returnUtil')
 
 const focus = async (ctx, next) => {
     const { wxSession, officialId } = ctx.query
-    const dataUser = await serviceOfficialUser.wxDeSession({
+    const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
     let options = {}
 
-    if(dataUser.userInfo) {
+    if(dataSession.userInfo) {
         options = {
-            userId: dataUser.userInfo.userId,
+            userId: dataSession.userInfo.userId,
             officialId : officialId
         }
     }

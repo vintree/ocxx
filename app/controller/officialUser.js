@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 02:17:20
+ * @Last Modified time: 2017-10-22 16:46:50
  */
 
 const log = require('../../config/log4js')
@@ -156,8 +156,7 @@ const getWxSession = async(ctx, next) => {
 // 得到session内容
 const deWxSession = async(ctx, next) => {
     const { wxSession } = ctx.query
-    let dataDeSession = ''
-    dataDeSession = await serviceOfficialUser.wxDeSession({
+    const dataDeSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
 
