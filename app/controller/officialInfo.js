@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-22 16:37:13
+ * @Last Modified time: 2017-10-22 17:08:54
  */
 
 const log = require('../../config/log4js')
@@ -165,7 +165,6 @@ const get = async (ctx, next) => {
             userId: dataSession.userInfo.userId
         })
         isOneself = dataOfficialUser.officialId === dataOfficialInfo.officialId
-        console.log('isOneself', isOneself);
     }
 
     if(dataOfficialInfo && dataOfficial) {
