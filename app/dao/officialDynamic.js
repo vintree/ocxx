@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:06:07 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-23 00:48:10
+ * @Last Modified time: 2017-10-23 16:13:56
  */
 
 const mongo = require('mongodb');
@@ -76,3 +76,34 @@ exports.getCount = async (options) => {
     return officialCount
 }
 
+exports.set = async (query = {}, update = {}, config = {}) => {
+    const db = await connect()
+    let dataUpdate = undefined
+    try {
+        if(query._id) {
+            query._id = new ObjectID(query._id)
+        }
+        // collection.findAndModify(query, sort, update, options, callback)
+        console.log('update', update);
+        dataUpdate = await db.collection('officialDynamic').findAndModify(
+            query,
+            [['_id', 'asc']],
+            update,
+            {
+                remove: false,
+                new: true
+            }
+        )
+    } catch(e) {
+        log.db.error(`tableName: officialDynamic; function: get; info: ${e}`)
+        console.error(e)
+    }
+    // n: 1, nModified: 0, ok: 1
+    // n 表示找到条数  nModified 表示修改条数 ok 表示操作状态
+    db.close()
+    if(dataUpdate.n === 0) {
+        return undefined
+    } else {
+        return dataUpdate.value
+    }
+}

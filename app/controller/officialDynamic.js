@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:36 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-23 00:32:26
+ * @Last Modified time: 2017-10-23 16:36:40
  */
 
 const asyncHooks = require('async_hooks')
@@ -15,7 +15,9 @@ const serviceOfficialInfo = require('../service/officialInfo')
 const { success, fail } = require('../utils/returnUtil')
 
 const focus = async (ctx, next) => {
-    const { wxSession, officialId } = ctx.query
+    ctx.response.type ='application/json'    
+    const { wxSession, officialId, isOfficialFocus } = ctx.query
+    // 关注
     const dataSession = await serviceOfficialUser.wxDeSession({
         wxSession
     })
@@ -27,24 +29,49 @@ const focus = async (ctx, next) => {
             officialId : officialId
         }
     }
-
-    // 新增添加
-    const dataOfficialDynamic = await serviceOfficialDynamic.createOfficialFocus(options)
-    ctx.response.type ='application/json'
-    if(dataOfficialDynamic) {
-        ctx.response.body = success({
-            msg: 'officialFocus',
-            data: {
-                isOfficialFocus: true
-            }
-        })
+    const dataUserPureOfficialFocusList = await serviceOfficialDynamic.getUserPureOfficialFocusList(options)
+    if(dataUserPureOfficialFocusList.length === 0) {
+        // 无记录，表示关注
+        // 新增添加
+        const dataOfficialDynamic = await serviceOfficialDynamic.createOfficialFocus(options)
+        if(dataOfficialDynamic) {
+            ctx.response.body = success({
+                msg: 'officialFocus',
+                data: {
+                    isOfficialFocus: true
+                }
+            })
+        } else {
+            ctx.response.body = fail({
+                msg: 'officialFocus',
+                data: {
+                    success: false
+                }
+            })
+        }
     } else {
-        ctx.response.body = fail({
-            msg: 'officialFocus',
-            data: {
-                isOfficialFocus: false
-            }
+        const dataUserPureOfficialFocusItem = dataUserPureOfficialFocusList[0]
+        // 有记录，表示关注、未关注
+        const dataOfficialDynamic = await serviceOfficialDynamic.setOfficialFocus({
+            officialDynamicId: dataUserPureOfficialFocusItem.officialDynamicId,
+            // isOfficialFocus = true 表示关注，isDelete标记为false
+            isDelete: !(isOfficialFocus === 'true')
         })
+        if(dataOfficialDynamic) {
+            ctx.response.body = success({
+                msg: 'officialFocus',
+                data: {
+                    isOfficialFocus: isOfficialFocus === 'true'
+                }
+            })
+        } else {
+            ctx.response.body = fail({
+                msg: 'officialFocus',
+                data: {
+                    success: false
+                }
+            })
+        }
     }
 }
 

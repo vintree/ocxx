@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:05:52 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-23 01:05:35
+ * @Last Modified time: 2017-10-23 15:59:21
  */
 
 const mongo = require('mongodb')
@@ -20,6 +20,19 @@ const time = require('../utils/time')
 // create ---------------------------------------------------------
 
 exports.createOfficialFocus = async(options) => {
+    const data = {
+        userId: options.userId + '',
+        officialId : options.officialId + '',
+        officialInfoId: undefined,
+        typeCode: 1003,
+        isShow: true,
+        isActive: true,
+        isDelete: false
+    }
+    return await daoOfficialDynamic.create(data)
+}
+
+exports.deleteOfficialFocus = async(options) => {
     const data = {
         userId: options.userId + '',
         officialId : options.officialId + '',
@@ -72,6 +85,22 @@ exports.createOfficialInfoSupport = async(options) => {
     return dataDynamic ? dataDynamic[0] : undefined
 }
 
+// set --------------------------------------
+exports.setOfficialFocus = async(options) => {
+    const query = {
+        _id : options.officialDynamicId.toString(),
+    }
+    delete options.officialDynamicId
+
+    const update = {
+        $set: {
+            ...options,
+            update: Date.parse(new Date())
+        }
+    }
+    return await daoOfficialDynamic.set(query, update)
+}
+
 // get --------------------------------------
 
 exports.getDynamicList = async(options) => {
@@ -97,6 +126,22 @@ exports.getDynamicOfficialFocusList = async(options) => {
         officialId: 1
     }
     return await daoOfficialDynamic.get(query, find)
+}
+
+// 查询用户关注的信息是否存在
+exports.getUserPureOfficialFocusList = async(options = {}) => {
+    const data = {
+        userId: options.userId,
+        officialId : options.officialId + '',
+        typeCode: 1003
+    }
+    let dataOfficialFocusList = await daoOfficialDynamic.get(data) || []
+    dataOfficialFocusList = loops.getAsyncNewArray(dataOfficialFocusList, (item) => {
+        item.officialDynamicId = item._id.toString()
+        delete item._id
+        return item
+    })
+    return dataOfficialFocusList
 }
 
 exports.getOfficialFocusCount = async(options) => {
