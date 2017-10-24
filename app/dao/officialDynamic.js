@@ -2,7 +2,7 @@
  * @Author: puxiao.wh 
  * @Date: 2017-07-23 17:06:07 
  * @Last Modified by: puxiao.wh
- * @Last Modified time: 2017-10-23 20:38:27
+ * @Last Modified time: 2017-10-24 19:05:41
  */
 
 const mongo = require('mongodb');
@@ -17,16 +17,16 @@ exports.create = async (save) => {
     save.create = Date.parse(new Date())
     try {
         dbData = await db.collection('officialDynamic').insert(save)
-        // await db.collection('officialDynamic').ensureIndex({
-        //     userId: 1,
-        //     officialId: 1,
-        //     officialInfoId: 1,
-        //     typeCode: 1
-        // }, {
-        //     unique: true, 
-        //     background: true, 
-        //     dropDups: true
-        // })
+        await db.collection('officialDynamic').ensureIndex({
+            userId: 1,
+            officialId: 1,
+            officialInfoId: 1,
+            typeCode: 1
+        }, {
+            unique: true, 
+            background: true, 
+            dropDups: true
+        })
     } catch(e) {
         log.db.error(`tableName: officialDynamic; function: created; info: ${e};`)
         console.error(e)
